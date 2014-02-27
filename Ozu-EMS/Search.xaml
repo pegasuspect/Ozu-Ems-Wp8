@@ -1,0 +1,53 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="Ozu_EMS.Search"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="clr-namespace:Ozu_EMS"
+    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True">
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel Grid.Row="0" Margin="12,17,0,0">
+            <TextBlock Text="{Binding LocalizedResources.SearchTitle, Source={StaticResource LocalizedStrings}}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text="{Binding LocalizedResources.ApplicationTitle, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
+        </StackPanel>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0">
+            <StackPanel>
+                <TextBox Margin="-2,0,60,0" Name="textToBeSearched"/>
+                <Button HorizontalAlignment="Right" Margin="0,-71,0,0" Width="72"
+                        VerticalAlignment="Top" Height="72" Click="Button_Click">
+                    <Image Source="/Assets/icons/search.png" Width="48" 
+                           Stretch="UniformToFill" HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                </Button>
+                
+            </StackPanel>
+                <u:CustomLongListSelector  
+                    Name="searchResultList"
+                    Margin="10,75,10,0" 
+                    ItemsSource="{Binding result, Mode=OneWay}"
+                    ItemTemplate="{StaticResource ListTemplate}"
+                    SelectionChanged="LongListSelector_SelectionChanged"
+                    />
+        </Grid>
+    </Grid>
+
+</phone:PhoneApplicationPage>

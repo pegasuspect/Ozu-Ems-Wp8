@@ -1,0 +1,103 @@
+﻿<Application
+    x:Class="Ozu_EMS.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone">
+
+    <!--Application Resources-->
+    <Application.Resources>
+        <local:LocalizedStrings xmlns:local="clr-namespace:Ozu_EMS" x:Key="LocalizedStrings"/>
+        <SolidColorBrush x:Key="CheckedBrush" Color="OrangeRed"/>
+        <SolidColorBrush x:Key="UnCheckedBrush" Color="White"/>
+        <DataTemplate x:Key="ButtonTileTemplate">
+            <Grid Background="#28F"
+                      Height="150"
+                      Margin="10">
+                <TextBlock 
+                        Text="{Binding title}"
+                        TextAlignment="Center" 
+                        VerticalAlignment="Center"
+                        TextWrapping="Wrap"
+                        Margin="10,-20,10,0"
+                        FontSize="18"
+                        Foreground="White"
+                    />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ListTemplate">
+            <StackPanel>
+                <Border BorderBrush="#333" BorderThickness="3" Margin="0,0,0,15"
+                                       Height="60" Width="60" HorizontalAlignment="Left">
+                    <Image Source="{Binding club_logo}" />
+                </Border>
+                <Border Padding="60,0,0,0" Margin="0,-90,0,0">
+                    <StackPanel>
+                        <TextBlock Text="{Binding name_tr}" TextWrapping="NoWrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
+                        <TextBlock Text="{Binding event_date}" TextWrapping="NoWrap" Margin="12,-6,0,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="EventsFooterTemplate">
+            <Grid Margin="0,10" Visibility="{Binding EventsData.LoadingVisibility, Mode=TwoWay}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Loading..." TextAlignment="Center" Margin="0,0,0,10"/>
+                <ProgressBar IsIndeterminate="True"
+                            VerticalAlignment="Bottom"
+                            Grid.Row="1" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="EventsHeaderTemplate">
+            <Grid Margin="0,10" Visibility="{Binding EventsData.LoadingVisibility, Mode=TwoWay}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Loading..." TextAlignment="Center" Margin="0,0,0,10"/>
+                <ProgressBar IsIndeterminate="True"
+                            VerticalAlignment="Bottom"
+                            Grid.Row="1" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ReachedLastEventFooterTemplate">
+            <Grid Margin="0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="No more upcoming events!" FontSize="26" TextAlignment="Center" Margin="0,0,0,10"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ReachedLastSearchEventFooterTemplate">
+            <Grid Margin="0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="End of list." TextWrapping="Wrap" 
+                           FontSize="26" TextAlignment="Center" Margin="0,0,0,10"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ReachedFirstEventHeaderTemplate">
+            <Grid Margin="0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="No more old events!" FontSize="26" TextAlignment="Center" Margin="0,0,0,10"/>
+            </Grid>
+        </DataTemplate>
+
+    </Application.Resources>
+
+    <Application.ApplicationLifetimeObjects>
+        <!--Required object that handles lifetime events for the application-->
+        <shell:PhoneApplicationService
+            Launching="Application_Launching" Closing="Application_Closing"
+            Activated="Application_Activated" Deactivated="Application_Deactivated"/>
+    </Application.ApplicationLifetimeObjects>
+
+</Application>
