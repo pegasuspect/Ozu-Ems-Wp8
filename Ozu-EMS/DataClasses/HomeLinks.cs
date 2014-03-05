@@ -11,14 +11,7 @@ namespace Ozu_EMS
         public const string homeDataKey = "HomeLinks";
         public HomeResult[] result { get; set; }
 
-        public Info info { get; set; }        
-    }
-
-    public class HomeInfo
-    {
-        public string requestPath { get; set; }
-        public int requestTime { get; set; }
-        public int responseStatus { get; set; }
+        public Info info { get; set; }
     }
 
     public class HomeResult

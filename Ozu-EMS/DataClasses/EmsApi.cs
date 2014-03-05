@@ -1,6 +1,7 @@
 ﻿using Coding4Fun.Toolkit.Controls;
 using Microsoft.Phone.Controls;
 using Newtonsoft.Json;
+using Ozu_EMS.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO.IsolatedStorage;
@@ -101,10 +102,10 @@ namespace Ozu_EMS
 
             apiResponse = JsonConvert.DeserializeObject<T>(rawApiResponse);
 
-            if (apiResponse.info.responseStatus != 200)
+            if (string.IsNullOrWhiteSpace(rawApiResponse) || apiResponse.info.responseStatus != 200)
             {
                 if (string.IsNullOrWhiteSpace(errorMessage))
-                    showToast("Check your coonection!");
+                    showToast(AppResources.ConnectionFailedFeedback);
                 else showToast(errorMessage);
             }
 
@@ -123,13 +124,13 @@ namespace Ozu_EMS
 
                 if (string.IsNullOrWhiteSpace(rawApiResponse))
                 {
-                    showToast("Server connection couldn't be made. Check connection!");
+                    showToast(AppResources.ConnectionFailedFeedback);
                 }
 
             }
             catch (Exception ex)
             {
-                showToast(ex.Message);
+                showToast(AppResources.RandomErrorFeedback + ex.Message);
             }
 
             return rawApiResponse;

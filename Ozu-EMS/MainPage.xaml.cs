@@ -21,7 +21,10 @@ namespace Ozu_EMS
     {
         public static ApiJsonData data;
         public static bool _isEventsLoaded = false;
-        // Constructor
+        private ApplicationBarIconButton searchAppBarButton;
+        private ApplicationBarIconButton settingsAppBarButton;
+        private bool isLoaded = false;
+
         public MainPage()
         {
             InitializeComponent();
@@ -30,7 +33,6 @@ namespace Ozu_EMS
 
             EventList.PositionChanged += EventList_PositionChanged;
 
-            // Sample code to localize the ApplicationBar
             BuildLocalizedApplicationBar();
         }
 
@@ -38,82 +40,115 @@ namespace Ozu_EMS
         {
             try
             {
+                if (!isLoaded)
+                {
+                    await initApplication();
+                    isLoaded = true;
+                }
+
+                updateButtons();
+
+                _isEventsLoaded = false;
+                EventList.IsEnabled = false;
+
                 SystemTray.ProgressIndicator = new ProgressIndicator();
                 SetProggressIndicator(true);
                 SystemTray.ProgressIndicator.Text = AppResources.LoadingMessage;
 
-                data = new ApiJsonData();
-                data.ClubsData = await EmsApi.GetClubsData();
                 data.EventsData = await EmsApi.GetEventsInfo();
-                data.HomeLinks = await EmsApi.GetHomeLinks();
-
-                //Set last button.
-                HomeLinksList.ItemsSource = data.HomeLinks.result.Take<HomeResult>(9).ToList<HomeResult>();
-                HomeResult[] last = { data.HomeLinks.result[data.HomeLinks.result.Length - 1] };
-                LastLink.ItemsSource = last;
-
-                //Reset the header and the footer of the events list
-                EventList.ListHeaderTemplate = null;
-                EventList.ListFooterTemplate = null;
-
-                //Load everything to application.
-                DataContext = data;
 
                 SetProggressIndicator(false);
 
+                EventList.IsEnabled = true;
                 _isEventsLoaded = true;
             }
             catch (Exception ex)
             {
-                EmsApi.showToast(ex.Message);
+                EmsApi.showToast("Main Page: " + ex.Message);
             }
 
 
         }
 
+        private async System.Threading.Tasks.Task initApplication()
+        {
+            data = new ApiJsonData();
+            data.ClubsData = await EmsApi.GetClubsData();
+            data.EventsData = await EmsApi.GetEventsInfo();
+            data.HomeLinks = await EmsApi.GetHomeLinks();
+
+            //Set last button.
+            HomeLinksList.ItemsSource = data.HomeLinks.result.Take<HomeResult>(9).ToList<HomeResult>();
+            HomeResult[] last = { data.HomeLinks.result[data.HomeLinks.result.Length - 1] };
+            LastLink.ItemsSource = last;
+
+            //Reset the header and the footer of the events list
+            EventList.ListHeaderTemplate = null;
+            EventList.ListFooterTemplate = null;
+
+            //Load everything to application.
+            DataContext = data;
+
+            var myEvents = EventList;
+
+            if (myEvents != null)
+                prettyDisplayDates();
+        }
+
+        private void prettyDisplayDates()
+        {
+            foreach (EventsResult item in EventList.ItemsSource as ObservableCollection<EventsResult>)
+            {
+                item.event_date = DateTime.Parse(item.event_date).ToLongDateString();
+            }
+        }
+
         private async void EventList_PositionChanged(object sender, EventArgs e)
         {
             ViewportControl viewport = sender as ViewportControl;
-
-            if (viewport.Viewport.Bottom >= viewport.Bounds.Bottom && MainPage._isEventsLoaded
-                && viewport.ManipulationState != System.Windows.Controls.Primitives.ManipulationState.Idle)
+            if (MainPage._isEventsLoaded && viewport.ManipulationState != System.Windows.Controls.Primitives.ManipulationState.Idle)
             {
-                
-                //Loading...
-                EventList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["EventsFooterTemplate"];
-                
                 ObservableCollection<EventsResult> res = MainPage.data.EventsData.result;
-                string baseUrl = EmsApi.getBaseUrl("events", "v1", "after", EmsApi.GetClubIds(), "", (res[res.Count - 1] as EventsResult).id);
-                EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
 
-                //Appending...
-                foreach (EventsResult oldResult in oldEvents.result)
-                    MainPage.data.EventsData.result.Add(oldResult);
+                if (viewport.Viewport.Bottom >= viewport.Bounds.Bottom)
+                {
+                    //Loading...
+                    EventList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["EventsFooterTemplate"];
+                    
+                    string baseUrl = EmsApi.getBaseUrl("events", "v1", "after", EmsApi.GetClubIds(), "", (res[res.Count - 1] as EventsResult).id);
+                    EventsData freshEventsList = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
 
-                //Displaying the footer acording to data obtained.
-                if (oldEvents == null || oldEvents.result.Count < 10)
-                    EventList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["ReachedLastEventFooterTemplate"];
-                else EventList.ListHeaderTemplate = null;
-            }
+                    //Appending...
+                    foreach (EventsResult item in freshEventsList.result)
+                        MainPage.data.EventsData.result.Add(item);
 
-            if (viewport.Viewport.Top <= viewport.Bounds.Top && MainPage._isEventsLoaded
-                && viewport.ManipulationState != System.Windows.Controls.Primitives.ManipulationState.Idle)
-            {
-                //Loading...
-                EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["EventsHeaderTemplate"];
+                    prettyDisplayDates();
 
-                ObservableCollection<EventsResult> res = MainPage.data.EventsData.result;
-                string baseUrl = EmsApi.getBaseUrl("events", "v1", "before", EmsApi.GetClubIds(), "", (res[0] as EventsResult).id);
-                EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
+                    //Displaying the footer acording to data obtained.
+                    if (freshEventsList == null || freshEventsList.result.Count < 10)
+                        EventList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["ReachedLastEventFooterTemplate"];
+                    else EventList.ListHeaderTemplate = null;
+                }
 
-                //Appending to the top of the list...
-                foreach (EventsResult oldResult in oldEvents.result)
-                    MainPage.data.EventsData.result.Insert(0, oldResult);
+                if (viewport.Viewport.Top <= viewport.Bounds.Top)
+                {
+                    //Loading...
+                    EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["EventsHeaderTemplate"];
 
-                //Displaying the header acording to data obtained.
-                if (oldEvents == null || oldEvents.result.Count < 10)
-                    EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["ReachedFirstEventHeaderTemplate"];
-                else EventList.ListHeaderTemplate = null;
+                    string baseUrl = EmsApi.getBaseUrl("events", "v1", "before", EmsApi.GetClubIds(), "", (res[0] as EventsResult).id);
+                    EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
+
+                    //Appending to the top of the list...
+                    foreach (EventsResult oldResult in oldEvents.result)
+                        MainPage.data.EventsData.result.Insert(0, oldResult);
+
+                    prettyDisplayDates();
+
+                    //Displaying the header acording to data obtained.
+                    if (oldEvents == null || oldEvents.result.Count < 10)
+                        EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["ReachedFirstEventHeaderTemplate"];
+                    else EventList.ListHeaderTemplate = null;
+                }
             }
         }
 
@@ -129,13 +164,13 @@ namespace Ozu_EMS
             ApplicationBar = new ApplicationBar();
 
             // Create settings button.
-            ApplicationBarIconButton settingsAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/settings.png", UriKind.Relative));
+            settingsAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/settings.png", UriKind.Relative));
             settingsAppBarButton.Text = AppResources.SettingsButtonText;
             settingsAppBarButton.Click += settingsAppBarButton_Click;
             ApplicationBar.Buttons.Add(settingsAppBarButton);
 
             // Create search button.
-            ApplicationBarIconButton searchAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/search.png", UriKind.Relative));
+            searchAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/search.png", UriKind.Relative));
             searchAppBarButton.Text = AppResources.SearchButtonText;
             searchAppBarButton.Click += searchAppBarButton_Click;
             ApplicationBar.Buttons.Add(searchAppBarButton);
@@ -147,6 +182,12 @@ namespace Ozu_EMS
             //ApplicationBarMenuItem appBarMenuItem = 
             //    new ApplicationBarMenuItem(AppResources.SettingsButtonText);
             //ApplicationBar.MenuItems.Add(appBarMenuItem);
+        }
+
+        private void updateButtons()
+        {
+            settingsAppBarButton.Text = AppResources.SettingsButtonText;
+            searchAppBarButton.Text = AppResources.SearchButtonText;
         }
 
         private void searchAppBarButton_Click(object sender, EventArgs e)

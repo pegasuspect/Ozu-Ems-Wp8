@@ -29,46 +29,51 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <!--<ScrollViewer>-->
-                <StackPanel>
-                    <StackPanel Height="200">
-                        <Image Source="{Binding cover_image}" Height="200" Stretch="UniformToFill"/>
-                        <TextBlock Name="title" FontSize="26" Text="{Binding name_tr}" 
-                               TextWrapping="Wrap" Margin="40,-40,20,0"
-                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            <StackPanel>
+                <StackPanel Height="200">
+                    <Image Source="{Binding cover_image}" Height="200" Stretch="UniformToFill"/>
+                    <StackPanel Name="title" Margin="40,-40,0,0" HorizontalAlignment="Right" Background="#A5000000">
+                        <TextBlock FontSize="26" Text="{Binding name}" 
+                               TextWrapping="Wrap" VerticalAlignment="Bottom"
                                Style="{StaticResource PhoneTextTitle3Style}" SizeChanged="TextBlock_SizeChanged"/>
                     </StackPanel>
-                    <TextBlock FontSize="24" FontWeight="Light" Text="{Binding description_tr}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}"/>
-                    <!--<StackPanel>
+                </StackPanel>
+                <ScrollViewer Name="scrollViewForDesc" HorizontalScrollBarVisibility="Disabled">
+                    <TextBlock FontSize="24" FontWeight="Light" Height="155"
+                               Text="{Binding description}" TextWrapping="Wrap" 
+                               Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}" Loaded="TextBlock_Loaded"/>
+                </ScrollViewer>
+                <!--<StackPanel>
                         <Controls:Map ZoomLevel="17" Center="41.036124, 29.253711" Name="EventMap" Height="200" />
                     </StackPanel>-->
-                    <TextBlock Text="Event Details:" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextTitle3Style}"/>
-                    <Grid Margin="32,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Date: " VerticalAlignment="Center"/>
-                        <HyperlinkButton Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding event_date}" Click="HyperlinkButton_Click"/>
-                        <TextBlock Text="Address: " Grid.Row="1" VerticalAlignment="Center"/>
-                        <HyperlinkButton Grid.Row="1" Content="{Binding address}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"       Click="HyperlinkButton_Click" />
-                        <TextBlock Text="Club Name: " Grid.Row="2" VerticalAlignment="Center"/>
-                        <HyperlinkButton Grid.Row="2" Content="{Binding club_name_tr}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"  Click="HyperlinkButton_Click"      />
-                        <TextBlock Text="Created At: " Grid.Row="3" VerticalAlignment="Center"/>
-                        <HyperlinkButton Grid.Row="3" Content="{Binding created_at}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"    Click="HyperlinkButton_Click"  />
-                        <TextBlock Text="Duration: " Grid.Row="4" VerticalAlignment="Center"/>
-                        <HyperlinkButton Grid.Row="4" Content="{Binding duration}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"      Click="HyperlinkButton_Click"  />
-                    </Grid>
-                    <StackPanel>
-                        <Button Content="Add to Calander" Click="Button_Click"/>
-                    </StackPanel>
+                <TextBlock Text="{Binding Path=LocalizedResources.EventDetails, Source={StaticResource LocalizedStrings}}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextTitle3Style}"/>
+                <Grid Margin="32,-15,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsClubName, Source={StaticResource LocalizedStrings}}" VerticalAlignment="Center"/>
+                    <HyperlinkButton Content="{Binding club_name}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"  Click="HyperlinkButton_Click"      />
+                    <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsAddress, Source={StaticResource LocalizedStrings}}" Grid.Row="1" VerticalAlignment="Center"/>
+                    <HyperlinkButton Grid.Row="1" Content="{Binding address}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"       Click="HyperlinkButton_Click" />
+                    <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsCreatedAt, Source={StaticResource LocalizedStrings}}" Grid.Row="2" VerticalAlignment="Center"/>
+                    <HyperlinkButton Name="CreatedAt" Grid.Row="2" Content="{Binding created_at}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"    Click="HyperlinkButton_Click"  />
+                    <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsDate, Source={StaticResource LocalizedStrings}}" Grid.Row="3" VerticalAlignment="Center"/>
+                    <HyperlinkButton Margin="0,0,0,-4"  Grid.Row="3" FontSize="18" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding event_date}" Click="HyperlinkButton_Click"/>
+                    <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsDuration, Source={StaticResource LocalizedStrings}}" Grid.Row="4" VerticalAlignment="Center"/>
+                    <HyperlinkButton Name="Duration" Grid.Row="4" Content="{Binding duration}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"      Click="HyperlinkButton_Click"  />
+                </Grid>
+                <StackPanel>
+                    <Button Content="{Binding Path=LocalizedResources.EventDetailsAddToCalendar, Source={StaticResource LocalizedStrings}}" Click="Button_Click"/>
                 </StackPanel>
+            </StackPanel>
             <!--</ScrollViewer>-->
         </Grid>
     </Grid>

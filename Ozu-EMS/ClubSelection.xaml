@@ -1,0 +1,61 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="Ozu_EMS.ClubSelection"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True">
+
+    <phone:PhoneApplicationPage.Resources>
+        <DataTemplate x:Key="CheckBoxTemplate">
+            <StackPanel>
+                <Border Padding="0,0,140,0">
+                    <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Content="{Binding name_tr}" VerticalAlignment="Bottom" ClickMode="Release"/>
+                </Border>
+                <Button DataContext="{Binding id}" Width="150" HorizontalAlignment="Right" Margin="0,-65,0,0" Content="{Binding Path=LocalizedResources.ClubDetails, Source={StaticResource LocalizedStrings}}" Click="Button_Click"/>
+            </StackPanel>
+        </DataTemplate>
+    </phone:PhoneApplicationPage.Resources>
+    
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock Text="{Binding Path=LocalizedResources.ApplicationTitle, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="{Binding Path=LocalizedResources.EventSettingsTitle, Source={StaticResource LocalizedStrings}}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+        
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            <StackPanel Margin="-5,0,30,0">
+                <TextBlock Text="{Binding Path=LocalizedResources.SelectNone, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextTitle2Style}" Margin="67,0,0,0" HorizontalAlignment="Left" Tap="FillRectangle_Tap"/>
+                <Rectangle Name="FillRectangle"
+                        Fill="{StaticResource CheckedBrush}" HorizontalAlignment="Left"
+                        Width="65" Height="65" Margin="0,-50,0,0" Tap="FillRectangle_Tap">
+                    <Rectangle.OpacityMask>
+                        <ImageBrush ImageSource="/Assets/icons/check.png"/>
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </StackPanel>
+            <phone:LongListSelector Name="SettinsCheckBoxList" Margin="0,40,0,0"
+                ItemsSource="{Binding ClubsData.result, Mode=OneWay}"
+                ItemTemplate="{StaticResource CheckBoxTemplate}"
+                SelectionChanged="HomeLinksList_SelectionChanged"
+                VerticalAlignment="Top"/>
+        </Grid>
+    </Grid>
+
+</phone:PhoneApplicationPage>

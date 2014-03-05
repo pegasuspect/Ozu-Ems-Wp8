@@ -5,10 +5,31 @@ namespace Ozu_EMS
     /// <summary>
     /// Provides access to string resources.
     /// </summary>
-    public class LocalizedStrings
-    {
-        private static AppResources _localizedResources = new AppResources();
+    using GalaSoft.MvvmLight;
+    using System.Windows;
 
-        public AppResources LocalizedResources { get { return _localizedResources; } }
+    public class LocalizedStrings : ViewModelBase
+    {
+        private static AppResources localizedresources = new AppResources();
+
+        public AppResources LocalizedResources
+        {
+            get { return localizedresources; }
+        }
+
+        public void UpdateLanguage()
+        {
+            localizedresources = new AppResources();
+            RaisePropertyChanged(() => LocalizedResources);
+        }
+
+        public static LocalizedStrings LocalizedStringsResource
+        {
+            get
+            {
+                return Application.Current.Resources["LocalizedStrings"]
+                    as LocalizedStrings;
+            }
+        }
     }
 }

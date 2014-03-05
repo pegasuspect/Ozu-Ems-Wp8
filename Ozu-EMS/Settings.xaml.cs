@@ -9,6 +9,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using System.IO.IsolatedStorage;
 using Newtonsoft.Json;
+using Ozu_EMS.Resources;
 
 namespace Ozu_EMS
 {
@@ -17,61 +18,18 @@ namespace Ozu_EMS
         public ClubSettings()
         {
             InitializeComponent();
-
-            DataContext = MainPage.data;
-
-            Loaded += Settings_Loaded;
         }
 
-        void Settings_Loaded(object sender, RoutedEventArgs e)
-        {
 
+
+        private void StackPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/ClubSelection.xaml", UriKind.RelativeOrAbsolute));
         }
 
-        private void HomeLinksList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void StackPanel_Tap_1(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            LongListSelector lls = sender as LongListSelector;
-
-            if (lls == null || lls.SelectedItem == null)
-                return;
-
-            EmsApi.SaveToPhone(JsonConvert.SerializeObject(MainPage.data.ClubsData), ClubsData.clubsDataKey);
-
-            lls.SelectedItem = null;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-            //TODO: Check for a valid page navigation and to aquire the data.
-
-            Button button = sender as Button;
-
-            NavigationService.Navigate(new Uri("/ClubDetails.xaml?id=" + button.DataContext, UriKind.RelativeOrAbsolute));
-
-        }
-
-        private void FillRectangle_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            SettinsCheckBoxList.ItemsSource = null;
-
-            if (FillRectangle.Fill == (System.Windows.Media.Brush)Application.Current.Resources["CheckedBrush"])
-            {
-                foreach (ClubResult clubItem in MainPage.data.ClubsData.result)
-                    clubItem.IsChecked = false;
-                FillRectangle.Fill = (System.Windows.Media.Brush)Application.Current.Resources["UnCheckedBrush"];
-            }
-            else
-            {
-                foreach (ClubResult clubItem in MainPage.data.ClubsData.result)
-                    clubItem.IsChecked = true;
-                FillRectangle.Fill = (System.Windows.Media.Brush)Application.Current.Resources["CheckedBrush"];
-            }
-
-            SettinsCheckBoxList.ItemsSource = MainPage.data.ClubsData.result;
-
-            EmsApi.SaveToPhone(JsonConvert.SerializeObject(MainPage.data.ClubsData), ClubsData.clubsDataKey);
-
+            NavigationService.Navigate(new Uri("/LanguageSelection.xaml", UriKind.RelativeOrAbsolute));
         }
     }
 }

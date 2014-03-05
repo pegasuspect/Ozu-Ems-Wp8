@@ -33,7 +33,7 @@
                 </Border>
                 <Border Padding="60,0,0,0" Margin="0,-90,0,0">
                     <StackPanel>
-                        <TextBlock Text="{Binding name_tr}" TextWrapping="NoWrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
+                        <TextBlock Text="{Binding name}" TextWrapping="NoWrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
                         <TextBlock Text="{Binding event_date}" TextWrapping="NoWrap" Margin="12,-6,0,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
                     </StackPanel>
                 </Border>

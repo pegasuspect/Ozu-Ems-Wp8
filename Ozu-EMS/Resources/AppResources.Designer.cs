@@ -79,6 +79,150 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string ClubDetails {
+            get {
+                return ResourceManager.GetString("ClubDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Club&apos;s:.
+        /// </summary>
+        public static string ClubDetailsClubs {
+            get {
+                return ResourceManager.GetString("ClubDetailsClubs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email Contacts.
+        /// </summary>
+        public static string ClubDetailsEmailContacts {
+            get {
+                return ResourceManager.GetString("ClubDetailsEmailContacts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manager&apos;s:.
+        /// </summary>
+        public static string ClubDetailsManagers {
+            get {
+                return ResourceManager.GetString("ClubDetailsManagers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Professor&apos;s:.
+        /// </summary>
+        public static string ClubDetailsProfessors {
+            get {
+                return ResourceManager.GetString("ClubDetailsProfessors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check your coonection!.
+        /// </summary>
+        public static string ConnectionFailedFeedback {
+            get {
+                return ResourceManager.GetString("ConnectionFailedFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event Details:.
+        /// </summary>
+        public static string EventDetails {
+            get {
+                return ResourceManager.GetString("EventDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address:.
+        /// </summary>
+        public static string EventDetailsAddress {
+            get {
+                return ResourceManager.GetString("EventDetailsAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add to Calander.
+        /// </summary>
+        public static string EventDetailsAddToCalendar {
+            get {
+                return ResourceManager.GetString("EventDetailsAddToCalendar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Club Name:.
+        /// </summary>
+        public static string EventDetailsClubName {
+            get {
+                return ResourceManager.GetString("EventDetailsClubName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created At:.
+        /// </summary>
+        public static string EventDetailsCreatedAt {
+            get {
+                return ResourceManager.GetString("EventDetailsCreatedAt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date: .
+        /// </summary>
+        public static string EventDetailsDate {
+            get {
+                return ResourceManager.GetString("EventDetailsDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duration:.
+        /// </summary>
+        public static string EventDetailsDuration {
+            get {
+                return ResourceManager.GetString("EventDetailsDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hour.
+        /// </summary>
+        public static string EventDetailsHour {
+            get {
+                return ResourceManager.GetString("EventDetailsHour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minutes.
+        /// </summary>
+        public static string EventDetailsMinutes {
+            get {
+                return ResourceManager.GetString("EventDetailsMinutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Club Filters.
+        /// </summary>
+        public static string EventSettingsTitle {
+            get {
+                return ResourceManager.GetString("EventSettingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to events.
         /// </summary>
         public static string EventsTitle {
@@ -97,6 +241,15 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string LanguageSettingsTitle {
+            get {
+                return ResourceManager.GetString("LanguageSettingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Retrieving data from the server....
         /// </summary>
         public static string LoadingMessage {
@@ -111,6 +264,15 @@ namespace Ozu_EMS.Resources {
         public static string NewsTitle {
             get {
                 return ResourceManager.GetString("NewsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occured:.
+        /// </summary>
+        public static string RandomErrorFeedback {
+            get {
+                return ResourceManager.GetString("RandomErrorFeedback", resourceCulture);
             }
         }
         
@@ -156,6 +318,24 @@ namespace Ozu_EMS.Resources {
         public static string SearchTitle {
             get {
                 return ResourceManager.GetString("SearchTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select All.
+        /// </summary>
+        public static string SelectAll {
+            get {
+                return ResourceManager.GetString("SelectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select None.
+        /// </summary>
+        public static string SelectNone {
+            get {
+                return ResourceManager.GetString("SelectNone", resourceCulture);
             }
         }
         

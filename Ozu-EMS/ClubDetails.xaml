@@ -32,9 +32,9 @@
                 <Image Source="{Binding cover_image}" Height="200" Stretch="UniformToFill"/>
                 <Image Source="{Binding logo}" Height="100" Width="100" Margin="15,-50,0,0"
                        Stretch="UniformToFill" HorizontalAlignment="Left"/>
-                <TextBlock FontSize="26" Text="{Binding name_tr}" Margin="130,-40,0,0" Style="{StaticResource PhoneTextTitle3Style}"/>
-                <TextBlock FontSize="24" FontWeight="Light" Text="{Binding description_tr}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}"/>
-                <TextBlock Text="Email Contacts:" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextTitle3Style}"/>
+                <TextBlock FontSize="26" Text="{Binding name}" Margin="130,-40,0,0" Style="{StaticResource PhoneTextTitle3Style}"/>
+                <TextBlock FontSize="24" FontWeight="Light" Text="{Binding description}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}"/>
+                <TextBlock Text="{Binding Path=LocalizedResources.ClubDetailsEmailContacts, Source={StaticResource LocalizedStrings}}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextTitle3Style}"/>
                 
                 <Grid Margin="32,0,0,0">
                     <Grid.ColumnDefinitions>
@@ -46,11 +46,11 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Professor: " VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Path=LocalizedResources.ClubDetailsProfessors, Source={StaticResource LocalizedStrings}}" VerticalAlignment="Center"/>
                     <HyperlinkButton Grid.Column="1" HorizontalAlignment="Left" Content="{Binding professor_email}" Click="HyperlinkButton_Click" />
-                    <TextBlock Text="Manager: " Grid.Row="1" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Path=LocalizedResources.ClubDetailsManagers, Source={StaticResource LocalizedStrings}}" Grid.Row="1" VerticalAlignment="Center"/>
                     <HyperlinkButton Grid.Column="1" HorizontalAlignment="Left"  Grid.Row="1" Content="{Binding manager_email}"  Click="HyperlinkButton_Click"/>
-                    <TextBlock Text="Clubs: " Grid.Row="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Path=LocalizedResources.ClubDetailsClubs, Source={StaticResource LocalizedStrings}}" Grid.Row="2" VerticalAlignment="Center"/>
                     <HyperlinkButton Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left"  Content="{Binding email}"  Click="HyperlinkButton_Click"/>
                 </Grid>
             </StackPanel>
