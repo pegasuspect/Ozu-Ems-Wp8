@@ -28,7 +28,7 @@
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0">
             <Grid Margin="30,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -36,10 +36,17 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <StackPanel Tap="StackPanel_Tap">
-                    <TextBlock Text="{Binding Path=LocalizedResources.EventSettingsTitle, Source={StaticResource LocalizedStrings}}" FontSize="42"/>
+                    <TextBlock Text="{Binding Path=LocalizedResources.EventSettingsTitle, 
+                        Source={StaticResource LocalizedStrings}}" FontSize="52"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Tap="StackPanel_Tap_1">
-                    <TextBlock Text="{Binding Path=LocalizedResources.LanguageSettingsTitle, Source={StaticResource LocalizedStrings}}" FontSize="42"/>
+                    <TextBlock Text="{Binding Path=LocalizedResources.LanguageSettingsTitle, 
+                        Source={StaticResource LocalizedStrings}}" FontSize="52"
+                               Margin="0,12"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Tap="StackPanel_Tap_2">
+                    <TextBlock Text="{Binding Path=LocalizedResources.AboutButtonText, 
+                        Source={StaticResource LocalizedStrings}}" FontSize="52"/>
                 </StackPanel>
             </Grid>
         </Grid>

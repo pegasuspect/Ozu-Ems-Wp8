@@ -38,17 +38,14 @@ namespace Ozu_EMS
                 NotifyPropertyChanged("IsChecked");
             }
         }
+        public string name { get; set; }
+        public string description { get; set; }
         public string id { get; set; }
-        public string slug { get; set; }
-        public string name_tr { get; set; }
-        public string name_en { get; set; }
-        public string description_tr { get; set; }
-        public string description_en { get; set; }
-        public string logo { get; set; }
-        public string cover_image { get; set; }
         public string email { get; set; }
         public string professor_email { get; set; }
         public string manager_email { get; set; }
+        public string logo { get; set; }
+        public string cover_image { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String propertyName)
@@ -62,4 +59,3 @@ namespace Ozu_EMS
     }
 
 }
-

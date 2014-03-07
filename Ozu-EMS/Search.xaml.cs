@@ -23,7 +23,7 @@ namespace Ozu_EMS
         {
             InitializeComponent();
 
-            searchResultList.PositionChanged +=searchResultList_PositionChanged;
+            searchResultList.PositionChanged += searchResultList_PositionChanged;
 
             Loaded += Search_Loaded;
         }
@@ -44,7 +44,7 @@ namespace Ozu_EMS
 
                 ObservableCollection<EventsResult> res = MainPage.data.EventsData.result;
                 string baseUrl = EmsApi.getBaseUrl("events", "v1", "search", EmsApi.GetClubIds(), SearchQuery, "", SearchData.result.Count);
-                EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
+                EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl);
 
                 //Appending...
                 foreach (EventsResult oldResult in oldEvents.result)
@@ -80,15 +80,14 @@ namespace Ozu_EMS
             SearchQuery = textToBeSearched.Text.ToString();
 
             EventsData res = await EmsApi.getRawResponseAs<EventsData>(
-                EmsApi.getBaseUrl("events", "v1", "search", 
-                    clubIds, SearchQuery),
-                    "No results! Check your settings and query then try again!"
+                EmsApi.getBaseUrl("events", "v1", "search", clubIds, SearchQuery)
             );
 
-            if (res.result == null || res.result.Count == 0)
+            if (res == null || res.result == null || res.result.Count == 0)
             {
-                EmsApi.showToast("No results! Check your settings and query then try again!");
-                searchResultList.ListFooterTemplate = null;
+                searchResultList.ItemsSource = new List<EventsResult>() { new EventsResult() };
+                searchResultList.ItemTemplate = (DataTemplate)Application.Current.Resources["NoSearchEventFooterTemplate"];
+                return;
             }
 
             SearchData = res;

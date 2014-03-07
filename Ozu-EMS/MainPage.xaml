@@ -44,7 +44,7 @@
                     <u:CustomLongListSelector
                         Name="EventList"
                         Margin="10,0" 
-                        ItemsSource="{Binding EventsData.result, Mode=OneWay}"
+                        ItemsSource="{Binding EventsData.result, Mode=TwoWay}"
                         ItemTemplate="{StaticResource ListTemplate}"
                         SelectionChanged="LongListSelector_SelectionChanged"
                     />

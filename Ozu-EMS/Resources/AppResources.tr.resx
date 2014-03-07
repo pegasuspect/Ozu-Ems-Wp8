@@ -215,4 +215,28 @@
   <data name="LanguageSettingsTitle" xml:space="preserve">
     <value>Dil Seç</value>
   </data>
+  <data name="AboutButtonText" xml:space="preserve">
+    <value>Hakkında</value>
+  </data>
+  <data name="EnglishLanguageText" xml:space="preserve">
+    <value>İngilizce - English</value>
+  </data>
+  <data name="TurkishLanguageText" xml:space="preserve">
+    <value>Türkçe - Türkçe</value>
+  </data>
+  <data name="EndOfList" xml:space="preserve">
+    <value>Liste sonu.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Yükleniyor...</value>
+  </data>
+  <data name="NoMoreOldEvents" xml:space="preserve">
+    <value>Daha eskisi bulunamadı!</value>
+  </data>
+  <data name="NoMoreUpcomingEvents" xml:space="preserve">
+    <value>Daha fazla etkinlik bulunamadı!</value>
+  </data>
+  <data name="NoSearchResultList" xml:space="preserve">
+    <value>Sonuç bulunamadı! Yeterli sayıda klüp seçtiğinizden ve arama sorgusunun en az 5 karakter olduğundan emin olun!</value>
+  </data>
 </root>

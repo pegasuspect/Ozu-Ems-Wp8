@@ -61,6 +61,15 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        public static string AboutButtonText {
+            get {
+                return ResourceManager.GetString("AboutButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to settings.
         /// </summary>
         public static string AppBarButtonText {
@@ -124,11 +133,29 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Check your coonection!.
+        ///   Looks up a localized string similar to Check your connection!.
         /// </summary>
         public static string ConnectionFailedFeedback {
             get {
                 return ResourceManager.GetString("ConnectionFailedFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End of list..
+        /// </summary>
+        public static string EndOfList {
+            get {
+                return ResourceManager.GetString("EndOfList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English - English.
+        /// </summary>
+        public static string EnglishLanguageText {
+            get {
+                return ResourceManager.GetString("EnglishLanguageText", resourceCulture);
             }
         }
         
@@ -250,6 +277,15 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        public static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Retrieving data from the server....
         /// </summary>
         public static string LoadingMessage {
@@ -264,6 +300,33 @@ namespace Ozu_EMS.Resources {
         public static string NewsTitle {
             get {
                 return ResourceManager.GetString("NewsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No more old events!.
+        /// </summary>
+        public static string NoMoreOldEvents {
+            get {
+                return ResourceManager.GetString("NoMoreOldEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No more upcoming events!.
+        /// </summary>
+        public static string NoMoreUpcomingEvents {
+            get {
+                return ResourceManager.GetString("NoMoreUpcomingEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No results! Check your club filters in settings, also make sure your query is at least 5 characters long!.
+        /// </summary>
+        public static string NoSearchResultList {
+            get {
+                return ResourceManager.GetString("NoSearchResultList", resourceCulture);
             }
         }
         
@@ -354,6 +417,15 @@ namespace Ozu_EMS.Resources {
         public static string SettingsTitle {
             get {
                 return ResourceManager.GetString("SettingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Turkish - Türkçe.
+        /// </summary>
+        public static string TurkishLanguageText {
+            get {
+                return ResourceManager.GetString("TurkishLanguageText", resourceCulture);
             }
         }
     }

@@ -31,7 +31,16 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <Button Name="ChangeLanguage" Content="Change to Turkish" Click="Button_Click"/>
+            <StackPanel VerticalAlignment="Top">
+                <RadioButton Content="{Binding Path=LocalizedResources.EnglishLanguageText, 
+                        Source={StaticResource LocalizedStrings}}" 
+                               FontSize="36" 
+                             Name="English" Checked="English_Checked"/>
+                <RadioButton Content="{Binding Path=LocalizedResources.TurkishLanguageText, 
+                        Source={StaticResource LocalizedStrings}}" 
+                               FontSize="36"
+                             Name="Turkish" Checked="Turkish_Checked"/>
+            </StackPanel>
         </Grid>
     </Grid>
 

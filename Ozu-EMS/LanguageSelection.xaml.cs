@@ -8,11 +8,16 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using System.Threading;
+using System.IO.IsolatedStorage;
+using Newtonsoft.Json;
 
 namespace Ozu_EMS
 {
     public partial class LanguageSelection : PhoneApplicationPage
     {
+        public const string languageKey = "languageKey";
+        private bool _isInitialized = false;
+
         public LanguageSelection()
         {
             InitializeComponent();
@@ -23,29 +28,61 @@ namespace Ozu_EMS
 
         void LanguageSelection_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Thread.CurrentThread.CurrentCulture.Equals(new System.Globalization.CultureInfo("en-US")))
-                ChangeLanguage.Content = "Change to Turkish";
-            else ChangeLanguage.Content = "Change to English";
+
+            if (MainPage.EmsLanguage == EmsApi.Languages.tr)
+                Turkish.IsChecked = true;
+            else English.IsChecked = true;
+
+            _isInitialized = true;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private static async System.Threading.Tasks.Task updateContentWithLanguage()
         {
-            Button b = sender as Button;
+            MainPage.LoadingStarted();
+            await MainPage.updateClubssWithLanguage();
+            MainPage.updateButtonTexts();
+            MainPage.LoadingEnd();
+        }
 
-            if (Thread.CurrentThread.CurrentCulture.Equals(new System.Globalization.CultureInfo("en-US")))
+        public static void changeLanguageTo(EmsApi.Languages lang)
+        {
+            MainPage.EmsLanguage = lang;
+
+            switch (lang)
             {
-                b.Content = "Change to English";
-                Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr");
-                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("tr");
+                case EmsApi.Languages.tr:
+                    Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr");
+                    Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("tr");
+                    break;
+                case EmsApi.Languages.en:
+                    Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                    Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                b.Content = "Change to Turkish";
-                Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
-            }
+
+            EmsApi.SaveToPhone(JsonConvert.SerializeObject(lang), languageKey);
 
             LocalizedStrings.LocalizedStringsResource.UpdateLanguage();
+        }
+
+        private async void English_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_isInitialized)
+            {
+                changeLanguageTo(EmsApi.Languages.en);
+                await updateContentWithLanguage();
+            }            
+        }
+
+        private async void Turkish_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_isInitialized)
+            {
+                changeLanguageTo(EmsApi.Languages.tr);
+                await updateContentWithLanguage();
+            }
         }
     }
 }

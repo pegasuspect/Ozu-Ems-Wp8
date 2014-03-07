@@ -54,14 +54,14 @@ namespace Ozu_EMS
             {
                 foreach (ClubResult clubItem in MainPage.data.ClubsData.result)
                     clubItem.IsChecked = false;
-                text.Text = AppResources.SelectAll;
+                selectAllText.Text = AppResources.SelectAll;
                 FillRectangle.Fill = (System.Windows.Media.Brush)Application.Current.Resources["UnCheckedBrush"];
             }
             else
             {
                 foreach (ClubResult clubItem in MainPage.data.ClubsData.result)
                     clubItem.IsChecked = true;
-                text.Text = AppResources.SelectNone;
+                selectAllText.Text = AppResources.SelectNone;
                 FillRectangle.Fill = (System.Windows.Media.Brush)Application.Current.Resources["CheckedBrush"];
             }
 

@@ -38,8 +38,8 @@
                                Style="{StaticResource PhoneTextTitle3Style}" SizeChanged="TextBlock_SizeChanged"/>
                     </StackPanel>
                 </StackPanel>
-                <ScrollViewer Name="scrollViewForDesc" HorizontalScrollBarVisibility="Disabled">
-                    <TextBlock FontSize="24" FontWeight="Light" Height="155"
+                <ScrollViewer Name="scrollViewForDesc" HorizontalScrollBarVisibility="Disabled" Height="175">
+                    <TextBlock FontSize="24" FontWeight="Light" MinHeight="155"
                                Text="{Binding description}" TextWrapping="Wrap" 
                                Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}" Loaded="TextBlock_Loaded"/>
                 </ScrollViewer>

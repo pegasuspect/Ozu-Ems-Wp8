@@ -42,11 +42,11 @@ namespace Ozu_EMS
             }
         }
 
-        public async static Task<EventsData> GetEventsInfo(string emsApiKey = "")
+        public async static Task<EventsData> GetEventsInfo(string emsApiKey = "", Languages lang = Languages.defaultLanguage)
         {
             string baseUrl;
 
-            baseUrl = getBaseUrl("events", "v1", "after-date", GetClubIds());
+            baseUrl = getBaseUrl("events", "v1", "after-date", GetClubIds(), "", "", 0, "", "", lang);
 
             return await getRawResponseAs<EventsData>(baseUrl);
 
@@ -66,20 +66,21 @@ namespace Ozu_EMS
             //}
         }
 
-        public async static Task<ClubsData> GetClubsData(string emsApiKey = "")
+        public async static Task<ClubsData> GetClubsData(string emsApiKey = "", Languages lang = Languages.defaultLanguage, bool isRefresh = false)
         {
 
             string rawApiResponse;
             string withKey = ClubsData.clubsDataKey;
             bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawApiResponse);
 
-            if (inPhoneMemmory)
+            if (inPhoneMemmory && !isRefresh)
             {
                 return JsonConvert.DeserializeObject<ClubsData>(rawApiResponse);
             }
             else
             {
-                string baseUrl = "http://api.ozucc.org/clubs/v1/list";
+                //"http://api.ozucc.org/clubs/v1/list";
+                string baseUrl = getBaseUrl("clubs", "v1", "list", "", "", "", 0, "", "", lang);
 
                 ClubsData clubsData = await getRawResponseAs<ClubsData>(baseUrl);
 
@@ -94,7 +95,7 @@ namespace Ozu_EMS
             }
         }
 
-        public static async Task<T> getRawResponseAs<T>(string baseUrl, string errorMessage = "") where T : IJsonData, new()
+        public static async Task<T> getRawResponseAs<T>(string baseUrl) where T : IJsonData, new()
         {
             T apiResponse = new T();
 
@@ -102,12 +103,17 @@ namespace Ozu_EMS
 
             apiResponse = JsonConvert.DeserializeObject<T>(rawApiResponse);
 
-            if (string.IsNullOrWhiteSpace(rawApiResponse) || apiResponse.info.responseStatus != 200)
-            {
-                if (string.IsNullOrWhiteSpace(errorMessage))
-                    showToast(AppResources.ConnectionFailedFeedback);
-                else showToast(errorMessage);
-            }
+            string errorMessage = "";
+
+            if (string.IsNullOrWhiteSpace(rawApiResponse))
+                errorMessage = AppResources.ConnectionFailedFeedback;
+            else if (apiResponse.info.responseStatus == 400)
+                foreach (Error error in apiResponse.info.log.error)
+                    foreach (string validation in error.validation)
+                        errorMessage += validation + "\n";
+
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+                System.Diagnostics.Debug.WriteLine(errorMessage);
 
             return apiResponse;
         }
@@ -116,22 +122,9 @@ namespace Ozu_EMS
         {
             string rawApiResponse = "";
 
-            try
-            {
-                HttpClient client = new HttpClient();
-
-                rawApiResponse = await client.GetStringAsync(baseUrl);
-
-                if (string.IsNullOrWhiteSpace(rawApiResponse))
-                {
-                    showToast(AppResources.ConnectionFailedFeedback);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                showToast(AppResources.RandomErrorFeedback + ex.Message);
-            }
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(baseUrl);
+            rawApiResponse = await response.Content.ReadAsStringAsync();
 
             return rawApiResponse;
         }
@@ -144,6 +137,9 @@ namespace Ozu_EMS
 
             string serverVersion = eventResults.result.version;
             string rawHomeVersion;
+
+            if (!string.IsNullOrWhiteSpace(serverVersion))
+                MainPage.version = serverVersion;
 
             if (IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(HomeVersion.homeVersionKey, out rawHomeVersion))
             {
@@ -184,14 +180,14 @@ namespace Ozu_EMS
         public static string getBaseUrl(
             string page, string version, string method,
             string clubIds = "", string q = "", string id = "",
-            int start = 0, string date = "", string count = "")
+            int start = 0, string date = "", string count = "", Languages lang = Languages.defaultLanguage)
         {
             string requestUrl = "http://api.ozucc.org";
             int _count = 10, _id = 0;
             requestUrl += "/" + page + "/" + version + "/" + method + "?";
 
             if (!string.IsNullOrWhiteSpace(clubIds))
-                requestUrl += "&club_ids=" + clubIds;
+                requestUrl += "&club_ids=" + HttpUtility.UrlEncode(clubIds);
             if (!string.IsNullOrWhiteSpace(q))
                 requestUrl += "&q=" + HttpUtility.UrlEncode(q);
             if (!string.IsNullOrWhiteSpace(date))
@@ -202,6 +198,8 @@ namespace Ozu_EMS
                 requestUrl += "&id=" + _id.ToString();
             if (start != 0)
                 requestUrl += "&start=" + start;
+            if (lang != Languages.defaultLanguage)
+                requestUrl += "&lang=" + lang;
 
             return requestUrl;
         }
@@ -237,6 +235,13 @@ namespace Ozu_EMS
                 Margin = new Thickness(0, 250, 0, 0),
                 TextWrapping = TextWrapping.Wrap
             }.Show();
+        }
+
+        public enum Languages
+        {
+            defaultLanguage,
+            tr,
+            en
         }
     }
 }

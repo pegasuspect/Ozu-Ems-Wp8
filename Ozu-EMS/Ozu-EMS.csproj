@@ -93,6 +93,8 @@
       <DependentUpon>ClubSelection.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataClasses\CustomLongListSelector.cs" />
+    <Compile Include="DataClasses\IJsonResult.cs" />
+    <Compile Include="DataClasses\Settings.cs" />
     <Compile Include="EventDetails.xaml.cs">
       <DependentUpon>EventDetails.xaml</DependentUpon>
     </Compile>
@@ -180,7 +182,9 @@
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\icons\cancel.png" />
     <Content Include="Assets\icons\check.png" />
+    <Content Include="Assets\icons\about.png" />
     <Content Include="Assets\icons\search.png" />
     <Content Include="Assets\icons\settings.png" />
     <Content Include="Assets\Tiles\FlipCycleTileLarge.png">

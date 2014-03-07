@@ -23,7 +23,7 @@ namespace Ozu_EMS
         {
             base.OnApplyTemplate();
             _viewportControl = (ViewportControl)GetTemplateChild("ViewportControl");
-            _viewportControl.ViewportChanged += OnViewportChanged;
+            _viewportControl.ManipulationStateChanged +=_viewportControl_ManipulationStateChanged;
             // This section is used for hiding scroll bar 
             // mayby you want to keep it I do not 
             // Uncomment following 2 line to do so...
@@ -31,11 +31,11 @@ namespace Ozu_EMS
             sb.RenderTransform = base.RenderTransform;
             // sb.Width = 0;
         }
-        // this event fires when postion position is changed
-        private void OnViewportChanged(object sender, ViewportChangedEventArgs args)
-        {
-            // we fire the event to the control which listens
 
+        // this event fires when manupulation changes
+        void _viewportControl_ManipulationStateChanged(object sender, ManipulationStateChangedEventArgs e)
+        {
+            //fire the event.
             PositionChanged(_viewportControl, new EventArgs());
         }
     }

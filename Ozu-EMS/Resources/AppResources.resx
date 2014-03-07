@@ -174,7 +174,7 @@
     <value>Professor's:</value>
   </data>
   <data name="ConnectionFailedFeedback" xml:space="preserve">
-    <value>Check your coonection!</value>
+    <value>Check your connection!</value>
   </data>
   <data name="EventDetails" xml:space="preserve">
     <value>Event Details:</value>
@@ -217,5 +217,29 @@
   </data>
   <data name="LanguageSettingsTitle" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="AboutButtonText" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="EnglishLanguageText" xml:space="preserve">
+    <value>English - English</value>
+  </data>
+  <data name="TurkishLanguageText" xml:space="preserve">
+    <value>Turkish - Türkçe</value>
+  </data>
+  <data name="EndOfList" xml:space="preserve">
+    <value>End of list.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="NoMoreOldEvents" xml:space="preserve">
+    <value>No more old events!</value>
+  </data>
+  <data name="NoMoreUpcomingEvents" xml:space="preserve">
+    <value>No more upcoming events!</value>
+  </data>
+  <data name="NoSearchResultList" xml:space="preserve">
+    <value>No results! Check your club filters in settings, also make sure your query is at least 5 characters long!</value>
   </data>
 </root>

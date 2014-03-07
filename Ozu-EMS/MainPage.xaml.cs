@@ -14,6 +14,9 @@ using System.Windows.Controls.Primitives;
 using System.Diagnostics;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.IO.IsolatedStorage;
+using Newtonsoft.Json;
 
 namespace Ozu_EMS
 {
@@ -21,13 +24,17 @@ namespace Ozu_EMS
     {
         public static ApiJsonData data;
         public static bool _isEventsLoaded = false;
-        private ApplicationBarIconButton searchAppBarButton;
-        private ApplicationBarIconButton settingsAppBarButton;
-        private bool isLoaded = false;
+        public static string version = "1.0";
+        public static EmsApi.Languages EmsLanguage = EmsApi.Languages.defaultLanguage;
+        private static ApplicationBarIconButton searchAppBarButton;
+        private static ApplicationBarIconButton settingsAppBarButton;
+        private bool isLoaded = false;        
 
         public MainPage()
         {
             InitializeComponent();
+
+            initLanguage();
 
             Loaded += MainPage_Loaded;
 
@@ -40,41 +47,94 @@ namespace Ozu_EMS
         {
             try
             {
+                _isEventsLoaded = false;
+                EventList.IsEnabled = false;
+
+                LoadingStarted();
+
                 if (!isLoaded)
                 {
                     await initApplication();
                     isLoaded = true;
                 }
+                else
+                {
+                    //Reset the header and the footer of the events list
+                    EventList.ListHeaderTemplate = null;
+                    EventList.ListFooterTemplate = null;
 
-                updateButtons();
+                    await updateEventsWithLanguage();
 
-                _isEventsLoaded = false;
-                EventList.IsEnabled = false;
+                    updateButtonTexts();
+                }
 
-                SystemTray.ProgressIndicator = new ProgressIndicator();
-                SetProggressIndicator(true);
-                SystemTray.ProgressIndicator.Text = AppResources.LoadingMessage;
+                LoadingEnd();
 
-                data.EventsData = await EmsApi.GetEventsInfo();
+                EventList.IsEnabled = true;
+                _isEventsLoaded = true;
 
+                //RaisePropertyChanged(() => data.EventsData.result);
+                // data.EventsData.result
+            }
+            catch (Exception ex)
+            {
                 SetProggressIndicator(false);
 
                 EventList.IsEnabled = true;
                 _isEventsLoaded = true;
-            }
-            catch (Exception ex)
-            {
+
                 EmsApi.showToast("Main Page: " + ex.Message);
             }
 
 
         }
 
-        private async System.Threading.Tasks.Task initApplication()
+        public static void LoadingEnd()
+        {
+            SetProggressIndicator(false);
+        }
+
+        public static void LoadingStarted()
+        {
+            SystemTray.ProgressIndicator = new ProgressIndicator();
+            SetProggressIndicator(true);
+            SystemTray.ProgressIndicator.Text = AppResources.LoadingMessage;
+        }
+
+        public static async Task updateClubssWithLanguage()
+        {
+            int length = data.ClubsData.result.Count;
+            bool[] isCheckeds = new bool[length];
+
+            for (int i = 0; i < length; i++)
+			     isCheckeds[i] = data.ClubsData.result[i].IsChecked;
+            
+            data.ClubsData.result.Clear();
+
+            ClubsData eventsResultsData = await EmsApi.GetClubsData("", EmsLanguage, true);
+
+            foreach (ClubResult result in eventsResultsData.result)
+                data.ClubsData.result.Add(result);
+
+            for (int i = 0; i < length; i++)
+                data.ClubsData.result[i].IsChecked = isCheckeds[i];
+        }
+
+        public static async Task updateEventsWithLanguage()
+        {
+            data.EventsData.result.Clear();
+
+            EventsData eventsResultsData = await EmsApi.GetEventsInfo("", EmsLanguage);
+
+            foreach (EventsResult result in eventsResultsData.result)
+                data.EventsData.result.Add(result);
+        }
+
+        private async Task initApplication()
         {
             data = new ApiJsonData();
             data.ClubsData = await EmsApi.GetClubsData();
-            data.EventsData = await EmsApi.GetEventsInfo();
+            data.EventsData = await EmsApi.GetEventsInfo("", EmsLanguage);
             data.HomeLinks = await EmsApi.GetHomeLinks();
 
             //Set last button.
@@ -82,17 +142,22 @@ namespace Ozu_EMS
             HomeResult[] last = { data.HomeLinks.result[data.HomeLinks.result.Length - 1] };
             LastLink.ItemsSource = last;
 
-            //Reset the header and the footer of the events list
-            EventList.ListHeaderTemplate = null;
-            EventList.ListFooterTemplate = null;
-
             //Load everything to application.
             DataContext = data;
 
-            var myEvents = EventList;
-
-            if (myEvents != null)
+            if (data.EventsData != null)
                 prettyDisplayDates();
+        }
+
+        private static void initLanguage()
+        {
+            string rawLanguageSettings;
+            bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(LanguageSelection.languageKey, out rawLanguageSettings);
+            if (inPhoneMemmory)
+            {
+                EmsLanguage = JsonConvert.DeserializeObject<EmsApi.Languages>(rawLanguageSettings);
+                LanguageSelection.changeLanguageTo(EmsLanguage);
+            }
         }
 
         private void prettyDisplayDates()
@@ -114,9 +179,9 @@ namespace Ozu_EMS
                 {
                     //Loading...
                     EventList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["EventsFooterTemplate"];
-                    
+
                     string baseUrl = EmsApi.getBaseUrl("events", "v1", "after", EmsApi.GetClubIds(), "", (res[res.Count - 1] as EventsResult).id);
-                    EventsData freshEventsList = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
+                    EventsData freshEventsList = await EmsApi.getRawResponseAs<EventsData>(baseUrl);
 
                     //Appending...
                     foreach (EventsResult item in freshEventsList.result)
@@ -136,7 +201,7 @@ namespace Ozu_EMS
                     EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["EventsHeaderTemplate"];
 
                     string baseUrl = EmsApi.getBaseUrl("events", "v1", "before", EmsApi.GetClubIds(), "", (res[0] as EventsResult).id);
-                    EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl, "An error occured! Check your connection!");
+                    EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl);
 
                     //Appending to the top of the list...
                     foreach (EventsResult oldResult in oldEvents.result)
@@ -148,11 +213,11 @@ namespace Ozu_EMS
                     if (oldEvents == null || oldEvents.result.Count < 10)
                         EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["ReachedFirstEventHeaderTemplate"];
                     else EventList.ListHeaderTemplate = null;
-                }
+                }                
             }
         }
 
-        private void SetProggressIndicator(bool isVisible)
+        private static void SetProggressIndicator(bool isVisible)
         {
             SystemTray.ProgressIndicator.IsIndeterminate = isVisible;
             SystemTray.ProgressIndicator.IsVisible = isVisible;
@@ -163,15 +228,16 @@ namespace Ozu_EMS
             // Set the page's ApplicationBar to a new instance of ApplicationBar.
             ApplicationBar = new ApplicationBar();
 
-            // Create settings button.
+            searchAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/search.png", UriKind.Relative));
             settingsAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/settings.png", UriKind.Relative));
-            settingsAppBarButton.Text = AppResources.SettingsButtonText;
+
+            updateButtonTexts();
+
+            // Add settings button.
             settingsAppBarButton.Click += settingsAppBarButton_Click;
             ApplicationBar.Buttons.Add(settingsAppBarButton);
 
-            // Create search button.
-            searchAppBarButton = new ApplicationBarIconButton(new Uri("/Assets/icons/search.png", UriKind.Relative));
-            searchAppBarButton.Text = AppResources.SearchButtonText;
+            // Add search button.
             searchAppBarButton.Click += searchAppBarButton_Click;
             ApplicationBar.Buttons.Add(searchAppBarButton);
 
@@ -184,7 +250,8 @@ namespace Ozu_EMS
             //ApplicationBar.MenuItems.Add(appBarMenuItem);
         }
 
-        private void updateButtons()
+
+        public static void updateButtonTexts()
         {
             settingsAppBarButton.Text = AppResources.SettingsButtonText;
             searchAppBarButton.Text = AppResources.SearchButtonText;
@@ -222,14 +289,10 @@ namespace Ozu_EMS
 
             if (item.SelectedIndex == 1)
             {
-                try
-                {
+                try {
                     if (MainPage.data.EventsData.result.Count == 0)
-                        EmsApi.showToast("No events! Check your settings for club filters!");
-                }
-                catch (Exception)
-                {
-                }
+                        MainPage.data.EventsData.result.Add(new EventsResult() { name = "No Events!", event_date = "Check your settings for club filters!" });
+                } catch { }
 
                 ApplicationBar.IsVisible = true;
                 return;

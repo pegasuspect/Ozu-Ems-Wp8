@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ozu_EMS.DataClasses;
 
 namespace Ozu_EMS
 {
@@ -23,7 +24,7 @@ namespace Ozu_EMS
         public int responseStatus { get; set; }
     }
 
-    public class EventsResult
+    public class EventsResult : IJsonResult
     {
         public string id { get; set; }
         public string event_id { get; set; }

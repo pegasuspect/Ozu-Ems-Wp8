@@ -37,5 +37,11 @@ namespace Ozu_EMS
             Clipboard.SetText((sender as HyperlinkButton).Content.ToString());
             EmsApi.showToast("Copied to clipboard!");
         }
+
+        private void TextBlock_Loaded(object sender, RoutedEventArgs e)
+        {
+            TextBlock textBlock = sender as TextBlock;
+            scrollViewForDesc.IsEnabled = (scrollViewForDesc.ExtentHeight < textBlock.ActualHeight ? true : false);
+        }
     }
 }

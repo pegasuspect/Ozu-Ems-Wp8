@@ -33,7 +33,11 @@
                 <Image Source="{Binding logo}" Height="100" Width="100" Margin="15,-50,0,0"
                        Stretch="UniformToFill" HorizontalAlignment="Left"/>
                 <TextBlock FontSize="26" Text="{Binding name}" Margin="130,-40,0,0" Style="{StaticResource PhoneTextTitle3Style}"/>
-                <TextBlock FontSize="24" FontWeight="Light" Text="{Binding description}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}"/>
+                <ScrollViewer Name="scrollViewForDesc" HorizontalScrollBarVisibility="Disabled" Height="280">
+                    <TextBlock FontSize="24" FontWeight="Light" MinHeight="155"
+                               Text="{Binding description}" TextWrapping="Wrap" 
+                               Margin="15,10" Style="{StaticResource PhoneTextNormalStyle}" Loaded="TextBlock_Loaded"/>
+                </ScrollViewer>
                 <TextBlock Text="{Binding Path=LocalizedResources.ClubDetailsEmailContacts, Source={StaticResource LocalizedStrings}}" TextWrapping="Wrap" Margin="15,10" Style="{StaticResource PhoneTextTitle3Style}"/>
                 
                 <Grid Margin="32,0,0,0">
