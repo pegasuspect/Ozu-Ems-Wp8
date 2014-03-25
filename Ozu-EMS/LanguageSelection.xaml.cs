@@ -10,6 +10,7 @@ using Microsoft.Phone.Shell;
 using System.Threading;
 using System.IO.IsolatedStorage;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace Ozu_EMS
 {
@@ -36,12 +37,10 @@ namespace Ozu_EMS
             _isInitialized = true;
         }
 
-        private static async System.Threading.Tasks.Task updateContentWithLanguage()
+        private static void updateContentWithLanguage()
         {
-            MainPage.LoadingStarted();
-            await MainPage.updateClubssWithLanguage();
             MainPage.updateButtonTexts();
-            MainPage.LoadingEnd();
+            ClubSelection.isInitialized = false;
         }
 
         public static void changeLanguageTo(EmsApi.Languages lang)
@@ -65,24 +64,20 @@ namespace Ozu_EMS
             EmsApi.SaveToPhone(JsonConvert.SerializeObject(lang), languageKey);
 
             LocalizedStrings.LocalizedStringsResource.UpdateLanguage();
+
+            updateContentWithLanguage();
         }
 
-        private async void English_Checked(object sender, RoutedEventArgs e)
+        private void English_Checked(object sender, RoutedEventArgs e)
         {
             if (_isInitialized)
-            {
                 changeLanguageTo(EmsApi.Languages.en);
-                await updateContentWithLanguage();
-            }            
         }
 
-        private async void Turkish_Checked(object sender, RoutedEventArgs e)
+        private void Turkish_Checked(object sender, RoutedEventArgs e)
         {
             if (_isInitialized)
-            {
                 changeLanguageTo(EmsApi.Languages.tr);
-                await updateContentWithLanguage();
-            }
         }
     }
 }

@@ -10,6 +10,8 @@
         <local:LocalizedStrings xmlns:local="clr-namespace:Ozu_EMS" x:Key="LocalizedStrings"/>
         <SolidColorBrush x:Key="CheckedBrush" Color="OrangeRed"/>
         <SolidColorBrush x:Key="UnCheckedBrush" Color="White"/>
+        <SolidColorBrush x:Key="BackButtonBrush" Color="Black"/>
+        <SolidColorBrush x:Key="GrayButtonBrush" Color="#DDD"/>
         <DataTemplate x:Key="ButtonTileTemplate">
             <Grid Background="#28F"
                       Height="150"
@@ -27,16 +29,30 @@
         </DataTemplate>
         <DataTemplate x:Key="ListTemplate">
             <StackPanel>
-                <Border BorderBrush="#333" BorderThickness="3" Margin="0,0,0,15"
-                                       Height="60" Width="60" HorizontalAlignment="Left">
-                    <Image Source="{Binding club_logo, Mode=OneWay}" />
+                <Border BorderBrush="#7F333333" BorderThickness="1" Margin="0,0,0,15"
+                    Height="260" Width="440" HorizontalAlignment="Left">
+                    <Image Source="{Binding cover_image, Mode=OneWay}" Stretch="UniformToFill" />
+                </Border>
+                <Border Padding="10,0,0,10" Margin="0,-100,0,0" Background="#A5000000">
+                    <StackPanel>
+                        <TextBlock Text="{Binding name, Mode=OneWay}" TextWrapping="NoWrap" Foreground="White"
+                                   Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
+                        <TextBlock Text="{Binding event_date, Mode=OneWay}" TextWrapping="NoWrap" Foreground="Gray"
+                                   Margin="12,-6,0,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="ClubListTemplate">
+            <StackPanel>
+                <Border BorderBrush="#7F333333" BorderThickness="1" Margin="0,0,0,15"
+                                            Height="60" Width="60" HorizontalAlignment="Left">
+                    <Image Source="{Binding logo, Mode=OneWay}" />
                 </Border>
                 <Border Padding="60,0,0,0" Margin="0,-90,0,0">
-                    <StackPanel>
-                        <TextBlock Text="{Binding name, Mode=OneWay}" TextWrapping="NoWrap" 
-                                   Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                        <TextBlock Text="{Binding event_date, Mode=OneWay}" TextWrapping="NoWrap" 
-                                   Margin="12,-6,0,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding name, Mode=OneWay}" Margin="10,-6,0,0"
+                                                   TextWrapping="NoWrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
                     </StackPanel>
                 </Border>
             </StackPanel>

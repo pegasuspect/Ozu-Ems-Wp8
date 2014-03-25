@@ -70,6 +70,15 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This event is already in the calendar!.
+        /// </summary>
+        public static string AlreadyInTheCalendar {
+            get {
+                return ResourceManager.GetString("AlreadyInTheCalendar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to settings.
         /// </summary>
         public static string AppBarButtonText {
@@ -84,6 +93,33 @@ namespace Ozu_EMS.Resources {
         public static string ApplicationTitle {
             get {
                 return ResourceManager.GetString("ApplicationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have a conflict in your calendar with this event! Do you still want to add it?.
+        /// </summary>
+        public static string CalendarPrompt {
+            get {
+                return ResourceManager.GetString("CalendarPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to calendar.
+        /// </summary>
+        public static string CalendarTitle {
+            get {
+                return ResourceManager.GetString("CalendarTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string CalenderPromptTitle {
+            get {
+                return ResourceManager.GetString("CalenderPromptTitle", resourceCulture);
             }
         }
         
@@ -133,11 +169,29 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to clubs.
+        /// </summary>
+        public static string ClubTitle {
+            get {
+                return ResourceManager.GetString("ClubTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Check your connection!.
         /// </summary>
         public static string ConnectionFailedFeedback {
             get {
                 return ResourceManager.GetString("ConnectionFailedFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copied to clipboard!.
+        /// </summary>
+        public static string CopyMessage {
+            get {
+                return ResourceManager.GetString("CopyMessage", resourceCulture);
             }
         }
         
@@ -241,7 +295,7 @@ namespace Ozu_EMS.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Club Filters.
+        ///   Looks up a localized string similar to Filter Clubs.
         /// </summary>
         public static string EventSettingsTitle {
             get {
@@ -264,6 +318,15 @@ namespace Ozu_EMS.Resources {
         public static string HomeTitle {
             get {
                 return ResourceManager.GetString("HomeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Info.
+        /// </summary>
+        public static string InfoTitle {
+            get {
+                return ResourceManager.GetString("InfoTitle", resourceCulture);
             }
         }
         
@@ -327,6 +390,78 @@ namespace Ozu_EMS.Resources {
         public static string NoSearchResultList {
             get {
                 return ResourceManager.GetString("NoSearchResultList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ago.
+        /// </summary>
+        public static string PrettyAgo {
+            get {
+                return ResourceManager.GetString("PrettyAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to day.
+        /// </summary>
+        public static string PrettyDay {
+            get {
+                return ResourceManager.GetString("PrettyDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hour.
+        /// </summary>
+        public static string PrettyHour {
+            get {
+                return ResourceManager.GetString("PrettyHour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to left.
+        /// </summary>
+        public static string PrettyLeft {
+            get {
+                return ResourceManager.GetString("PrettyLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minute.
+        /// </summary>
+        public static string PrettyMinute {
+            get {
+                return ResourceManager.GetString("PrettyMinute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to s.
+        /// </summary>
+        public static string PrettyPluralSuffix {
+            get {
+                return ResourceManager.GetString("PrettyPluralSuffix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to week.
+        /// </summary>
+        public static string PrettyWeek {
+            get {
+                return ResourceManager.GetString("PrettyWeek", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to year.
+        /// </summary>
+        public static string PrettyYear {
+            get {
+                return ResourceManager.GetString("PrettyYear", resourceCulture);
             }
         }
         

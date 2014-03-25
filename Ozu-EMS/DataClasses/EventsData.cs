@@ -5,16 +5,18 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ozu_EMS.DataClasses;
 
 namespace Ozu_EMS
 {
 
-    public class EventsData : IJsonData
+    public class EventsData : IJsonData, INotifyPropertyChanged
     {
         public const string eventsDataKey = "EventsData";
+        public const string calendarDataKey = "CalendarData";
         public Info info { get; set; }
         public ObservableCollection<EventsResult> result { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public class EventsInfo
@@ -24,8 +26,10 @@ namespace Ozu_EMS
         public int responseStatus { get; set; }
     }
 
-    public class EventsResult : IJsonResult
+    public class EventsResult
     {
+        public bool isInCalendar { get; set; }
+        public string originalDate { get; set; }
         public string id { get; set; }
         public string event_id { get; set; }
         public string club_id { get; set; }

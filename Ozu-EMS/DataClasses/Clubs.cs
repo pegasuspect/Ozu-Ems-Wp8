@@ -11,8 +11,9 @@ namespace Ozu_EMS
     public class ClubsData : IJsonData
     {
         public const string clubsDataKey = "ClubsData";
+        public const string IsCheckedKey = "IsCheckedKey";
         public Info info { get; set; }
-        public ObservableCollection<ClubResult> result { get; set; }
+        public List<ClubResult> result { get; set; }
     }
 
     public class ClubInfo
@@ -22,22 +23,9 @@ namespace Ozu_EMS
         public int responseStatus { get; set; }
     }
 
-    public class ClubResult
+    public class ClubResult : INotifyPropertyChanged
     {
-        private bool _isChecked;
-        public bool IsChecked
-        {
-            get
-            {
-                return _isChecked;
-            }
-            set
-            {
-                if (_isChecked != value)
-                    _isChecked = value;
-                NotifyPropertyChanged("IsChecked");
-            }
-        }
+        public bool IsChecked { get; set; }
         public string name { get; set; }
         public string description { get; set; }
         public string id { get; set; }
@@ -48,14 +36,6 @@ namespace Ozu_EMS
         public string cover_image { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (null != handler)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
     }
 
 }

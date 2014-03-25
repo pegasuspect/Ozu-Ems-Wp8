@@ -38,13 +38,15 @@ namespace Ozu_EMS
             ViewportControl viewport = sender as ViewportControl;
 
             if (viewport.Viewport.Bottom >= viewport.Bounds.Bottom && MainPage._isEventsLoaded
-                && viewport.ManipulationState != System.Windows.Controls.Primitives.ManipulationState.Idle)
+                && viewport.ManipulationState == System.Windows.Controls.Primitives.ManipulationState.Animating)
             {
                 searchResultList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["EventsFooterTemplate"];
 
                 ObservableCollection<EventsResult> res = MainPage.data.EventsData.result;
                 string baseUrl = EmsApi.getBaseUrl("events", "v1", "search", EmsApi.GetClubIds(), SearchQuery, "", SearchData.result.Count);
                 EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl);
+
+                EmsApi.prettyDisplayDates(oldEvents.result);
 
                 //Appending...
                 foreach (EventsResult oldResult in oldEvents.result)
@@ -72,27 +74,37 @@ namespace Ozu_EMS
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            string rawClubData;
-            string withKey = ClubsData.clubsDataKey;
-            bool isClubSettingsInMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawClubData);
+            searchResultList.ListFooterTemplate = null;
 
             string clubIds = EmsApi.GetClubIds();
             SearchQuery = textToBeSearched.Text.ToString();
 
-            EventsData res = await EmsApi.getRawResponseAs<EventsData>(
-                EmsApi.getBaseUrl("events", "v1", "search", clubIds, SearchQuery)
-            );
+            AddInfoTemplate("EventsFooterTemplate");
+
+            string url = EmsApi.getBaseUrl("events", "v1", "search", "", SearchQuery, "", 0, "", "", MainPage.EmsLanguage);
+            EventsData res = await EmsApi.getRawResponseAs<EventsData>(url);
 
             if (res == null || res.result == null || res.result.Count == 0)
             {
-                searchResultList.ItemsSource = new List<EventsResult>() { new EventsResult() };
-                searchResultList.ItemTemplate = (DataTemplate)Application.Current.Resources["NoSearchEventFooterTemplate"];
+                AddInfoTemplate("NoSearchEventFooterTemplate");
                 return;
             }
 
+            EmsApi.prettyDisplayDates(res.result);
+
+            AddInfoTemplate("ListTemplate", true, res.result);
+
+            //To reach it from details page.
             SearchData = res;
-            searchResultList.ItemsSource = null;
-            searchResultList.ItemsSource = SearchData.result;
+        }
+
+        private void AddInfoTemplate(string templateKey, bool isHitVisible = false, ObservableCollection<EventsResult> itemSource = null)
+        {
+            if (itemSource == null)
+                searchResultList.ItemsSource = new List<EventsResult>() { new EventsResult() };
+            else searchResultList.ItemsSource = itemSource;
+            searchResultList.ItemTemplate = (DataTemplate)Application.Current.Resources[templateKey];
+            searchResultList.IsHitTestVisible = isHitVisible;
         }
     }
 }

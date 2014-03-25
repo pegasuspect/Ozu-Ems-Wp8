@@ -1,9 +1,11 @@
 ﻿using Coding4Fun.Toolkit.Controls;
 using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
 using Newtonsoft.Json;
 using Ozu_EMS.Resources;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net;
@@ -16,6 +18,24 @@ namespace Ozu_EMS
 {
     public class EmsApi : PhoneApplicationPage
     {
+        public static Dictionary<string, bool> GetClubsIdIsChecked()
+        {
+            string rawApiResponse;
+            string withKey = ClubsData.IsCheckedKey;
+            bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawApiResponse);
+
+            return inPhoneMemmory ? JsonConvert.DeserializeObject<Dictionary<string, bool>>(rawApiResponse) : new Dictionary<string,bool>();
+        }
+
+        public static EventsData GetCalendarData()
+        {
+            EventsData newData = new EventsData() { info = new Info(), result = new ObservableCollection<EventsResult>() };
+            string rawApiResponse;
+            string withKey = EventsData.calendarDataKey;
+            bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawApiResponse);
+
+            return inPhoneMemmory ? JsonConvert.DeserializeObject<EventsData>(rawApiResponse) : newData;
+        }
         public async static Task<HomeLinks> GetHomeLinks(string emsApiKey = "")
         {
 
@@ -30,9 +50,8 @@ namespace Ozu_EMS
             }
             else
             {
-                MessageBox.Show("There is an update fo ya! =)");
-
-                string baseUrl = "http://api.ozucc.org/linker/v1/list";
+                Log("There is an update fo ya! =)");
+                string baseUrl = getBaseUrl("linker","v1","list");
 
                 HomeLinks homeLinks = await getRawResponseAs<HomeLinks>(baseUrl);
 
@@ -66,33 +85,34 @@ namespace Ozu_EMS
             //}
         }
 
-        public async static Task<ClubsData> GetClubsData(string emsApiKey = "", Languages lang = Languages.defaultLanguage, bool isRefresh = false)
+        public async static Task<ClubsData> GetClubsData(string emsApiKey = "", Languages lang = Languages.defaultLanguage)
         {
 
             string rawApiResponse;
-            string withKey = ClubsData.clubsDataKey;
+            string withKey = ClubsData.IsCheckedKey;
             bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawApiResponse);
 
-            if (inPhoneMemmory && !isRefresh)
+            string baseUrl = getBaseUrl("clubs", "v1", "list", "", "", "", 0, "", "", lang);
+
+            ClubsData clubsData = await getRawResponseAs<ClubsData>(baseUrl);
+
+            if (inPhoneMemmory)
             {
-                return JsonConvert.DeserializeObject<ClubsData>(rawApiResponse);
+                foreach (ClubResult club in clubsData.result)
+                    club.IsChecked = MainPage.data.ClubIdIsCheked[club.id];
             }
             else
             {
-                //"http://api.ozucc.org/clubs/v1/list";
-                string baseUrl = getBaseUrl("clubs", "v1", "list", "", "", "", 0, "", "", lang);
-
-                ClubsData clubsData = await getRawResponseAs<ClubsData>(baseUrl);
-
                 foreach (ClubResult club in clubsData.result)
                 {
                     club.IsChecked = true;
+                    MainPage.data.ClubIdIsCheked[club.id] = true;
                 }
-
-                SaveToPhone(JsonConvert.SerializeObject(clubsData), withKey);
-
-                return clubsData;
             }
+
+            SaveToPhone(JsonConvert.SerializeObject(MainPage.data.ClubIdIsCheked), ClubsData.IsCheckedKey);
+
+            return clubsData;
         }
 
         public static async Task<T> getRawResponseAs<T>(string baseUrl) where T : IJsonData, new()
@@ -113,7 +133,7 @@ namespace Ozu_EMS
                         errorMessage += validation + "\n";
 
             if (!string.IsNullOrWhiteSpace(errorMessage))
-                System.Diagnostics.Debug.WriteLine(errorMessage);
+                Log(errorMessage);
 
             return apiResponse;
         }
@@ -131,7 +151,7 @@ namespace Ozu_EMS
 
         public async static Task<bool> IsHomeVersionUpToDate(string emsApiKey = "")
         {
-            string baseUrl = "http://api.ozucc.org/linker/v1/list-version";
+            string baseUrl = getBaseUrl("linker", "v1", "list-version");
 
             HomeVersion eventResults = await getRawResponseAs<HomeVersion>(baseUrl);
 
@@ -154,21 +174,25 @@ namespace Ozu_EMS
 
         public static string GetClubIds()
         {
-            string rawClubsData;
-            string withKey = ClubsData.clubsDataKey;
-            bool isClubSettingsInMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawClubsData);
+            string temp;
+            string withKey = ClubsData.IsCheckedKey;
+            bool isClubSettingsInMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out temp);
 
-            ClubResult[] results = JsonConvert.DeserializeObject<ClubsData>(rawClubsData).result
-                .Where<ClubResult>(item => item.IsChecked == true).ToArray<ClubResult>();
-            short[] clubIds = new short[results.Length];
-            for (int i = 0; i < clubIds.Length; i++)
+            Dictionary<string, bool> results = JsonConvert.DeserializeObject<Dictionary<string, bool>>(temp);
+
+            List<short> clubIds = new  List<short>();
+
+            foreach (KeyValuePair<string, bool> item in results)
             {
-                short.TryParse(results[i].id, out clubIds[i]);
+                if (item.Value)
+                {
+                    clubIds.Add(short.Parse(item.Key));
+                }
             }
 
-            rawClubsData = string.Join<short>(",", clubIds);
+            temp = string.Join<short>(",", clubIds);
 
-            return rawClubsData;
+            return temp;
         }
 
         public static void SaveToPhone(string rawApiResponse, string withKey)
@@ -183,6 +207,7 @@ namespace Ozu_EMS
             int start = 0, string date = "", string count = "", Languages lang = Languages.defaultLanguage)
         {
             string requestUrl = "http://api.ozucc.org";
+            //string requestUrl = "http://176.41.7.135/api.ozu/public";
             int _count = 10, _id = 0;
             requestUrl += "/" + page + "/" + version + "/" + method + "?";
 
@@ -242,6 +267,101 @@ namespace Ozu_EMS
             defaultLanguage,
             tr,
             en
+        }
+
+        public static void StartTrayLoadingAnimation()
+        {
+            SystemTray.ProgressIndicator = new ProgressIndicator();
+            SetProggressIndicatorVisibility(true);
+            SystemTray.ProgressIndicator.Text = AppResources.LoadingMessage;
+        }
+        public static void SetProggressIndicatorVisibility(bool isVisible)
+        {
+            if (SystemTray.ProgressIndicator != null)
+            {
+                SystemTray.ProgressIndicator.IsIndeterminate = isVisible;
+                SystemTray.ProgressIndicator.IsVisible = isVisible;
+            }
+        }
+        public static void Log(string msg)
+        {
+            if (MainPage.IsOnDebug)
+                MessageBox.Show(msg);
+        }
+
+        public static void prettyDisplayDates(ObservableCollection<EventsResult> items)
+        {
+            foreach (EventsResult item in items)
+            {
+                DateTime date;
+                DateTime.TryParse(item.event_date, out date);
+                item.originalDate = item.event_date;
+                if (date != null && 2011 <= date.Year)
+                    item.event_date = GetTimeSpan(date);
+
+            }
+        }
+        public static string GetTimeSpan(DateTime postDate, bool isDuration = false)
+        {
+            string stringy = string.Empty;
+            TimeSpan diff = DateTime.Now.Subtract(postDate);
+            double days = diff.Days;
+            double hours = diff.Hours + days * 24;
+            double minutes = diff.Minutes + hours * 60;
+
+            string
+                year = AppResources.PrettyYear,
+                day = AppResources.PrettyDay,
+                week = AppResources.PrettyWeek,
+                hour = AppResources.PrettyHour,
+                minute = AppResources.PrettyMinute,
+                pluralSuffix = AppResources.PrettyPluralSuffix,
+                left = AppResources.PrettyLeft,
+                ago = AppResources.PrettyAgo;
+
+            if (IsInRange(-1, minutes, 1) && !isDuration)
+                return "Just Now";
+
+            double years = Math.Floor(diff.TotalDays / 365);
+            if (IsInRange(double.NegativeInfinity, years, -1, false, false) || IsInRange(1, years, double.PositiveInfinity, false, false))
+            {
+                return string.Format("{0} " + year + "{1} {2}", years < 0 ? -1 * years : years, years >= 2 ? pluralSuffix : null, isDuration ? "" : years < 0 ? left : ago);
+            }
+            double weeks = Math.Floor(diff.TotalDays / 7);
+            if (IsInRange(double.NegativeInfinity, weeks, -1) || IsInRange(1, weeks, double.PositiveInfinity))
+            {
+                double partOfWeek = days - weeks * 7;
+                if (partOfWeek > 0)
+                {
+                    stringy = string.Format(", {0} " + day + "{1}", partOfWeek, partOfWeek > 1 ? pluralSuffix : null);
+                }
+                return string.Format("{0} " + week + "{1}{2} {3}", weeks < 0 ? -1 * weeks : weeks, weeks >= 2 ? pluralSuffix : null, stringy, isDuration ? "" : weeks < 0 ? left : ago);
+            }
+            if (IsInRange(double.NegativeInfinity, days, -1) || IsInRange(1, days, double.PositiveInfinity))
+            {
+                double partOfDay = hours - days * 24;
+                if (partOfDay > 0)
+                {
+                    stringy = string.Format(", {0} " + hour + "{1}", partOfDay, partOfDay > 1 ? pluralSuffix : null);
+                }
+                return string.Format("{0} " + day + "{1}{2} {3}", days < 0 ? -1 * days : days, days >= 2 ? pluralSuffix : null, stringy, isDuration ? "" : days < 0 ? left : ago);
+            }
+            if (IsInRange(double.NegativeInfinity, hours, -1) || IsInRange(1, hours, double.PositiveInfinity))
+            {
+                double partOfHour = minutes - hours * 60;
+                if (partOfHour > 0)
+                {
+                    stringy = string.Format(", {0} " + minute + "{1}", partOfHour, partOfHour > 1 ? pluralSuffix : null);
+                }
+                return string.Format("{0} " + hour + "{1}{2} {3}", hours < 0 ? -1 * hours : hours, hours >= 2 ? pluralSuffix : null, stringy, isDuration ? "" : hours < 0 ? left : ago);
+            }
+
+            // Only condition left is minutes > 1
+            return string.Format("{0} " + minute + pluralSuffix + " {1}", minutes, isDuration ? "" : minutes < 0 ? left : ago);
+        }
+        public static bool IsInRange(double from, double number, double to, bool includingFrom = true, bool includingTo = true)
+        {
+            return (includingFrom ? from <= number : from < number) && (includingTo ? number <= to : number < to);
         }
     }
 }

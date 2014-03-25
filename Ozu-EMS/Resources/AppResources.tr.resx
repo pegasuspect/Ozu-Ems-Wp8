@@ -239,4 +239,49 @@
   <data name="NoSearchResultList" xml:space="preserve">
     <value>Sonuç bulunamadı! Yeterli sayıda klüp seçtiğinizden ve arama sorgusunun en az 5 karakter olduğundan emin olun!</value>
   </data>
+  <data name="PrettyAgo" xml:space="preserve">
+    <value>önce</value>
+  </data>
+  <data name="PrettyDay" xml:space="preserve">
+    <value>gün</value>
+  </data>
+  <data name="PrettyHour" xml:space="preserve">
+    <value>saat</value>
+  </data>
+  <data name="PrettyLeft" xml:space="preserve">
+    <value>kaldı</value>
+  </data>
+  <data name="PrettyMinute" xml:space="preserve">
+    <value>dakika</value>
+  </data>
+  <data name="PrettyPluralSuffix" xml:space="preserve">
+    <value />
+  </data>
+  <data name="PrettyWeek" xml:space="preserve">
+    <value>hafta</value>
+  </data>
+  <data name="PrettyYear" xml:space="preserve">
+    <value>yıl</value>
+  </data>
+  <data name="CalendarPrompt" xml:space="preserve">
+    <value>Ajandanızda bu etkinliğin ekleneceği yerde bir çakışma var. Yine de eklemek ister misiniz?</value>
+  </data>
+  <data name="CalenderPromptTitle" xml:space="preserve">
+    <value>Uyarı</value>
+  </data>
+  <data name="CopyMessage" xml:space="preserve">
+    <value>Kopyalandı!</value>
+  </data>
+  <data name="CalendarTitle" xml:space="preserve">
+    <value>takvim</value>
+  </data>
+  <data name="ClubTitle" xml:space="preserve">
+    <value>klüpler</value>
+  </data>
+  <data name="AlreadyInTheCalendar" xml:space="preserve">
+    <value>Bu etkinlik takviminizde mevcut!</value>
+  </data>
+  <data name="InfoTitle" xml:space="preserve">
+    <value>Bilgi</value>
+  </data>
 </root>

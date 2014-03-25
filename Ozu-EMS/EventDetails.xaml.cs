@@ -10,6 +10,7 @@ using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
 using Microsoft.Phone.UserData;
 using Ozu_EMS.Resources;
+using System.Globalization;
 
 namespace Ozu_EMS
 {
@@ -17,6 +18,7 @@ namespace Ozu_EMS
     {
         private string _eventId;
         private bool _isSearch;
+        private bool _isCalendar;
         public EventDetails()
         {
             InitializeComponent();
@@ -26,44 +28,50 @@ namespace Ozu_EMS
 
         void EventDetails_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!_isSearch)
-                DataContext = (EventsResult)MainPage.data.EventsData.result.Where<EventsResult>(item => item.id == _eventId).First<EventsResult>();
-            else DataContext = (EventsResult)Search.SearchData.result.Where<EventsResult>(item => item.id == _eventId).First<EventsResult>();
+            if (_isSearch)
+                DataContext = (EventsResult)Search.SearchData.result.Where<EventsResult>(item => item.id == _eventId).First<EventsResult>();
+            else if (_isCalendar)
+                DataContext = (EventsResult)MainPage.data.CalendarData.result.Where<EventsResult>(item => item.id == _eventId).First<EventsResult>(); 
+            else DataContext = (EventsResult)MainPage.data.EventsData.result.Where<EventsResult>(item => item.id == _eventId).First<EventsResult>(); 
 
             EventsResult res = DataContext as EventsResult;
-            double hours = double.Parse(res.duration);
+            reorginizeDates(res);
+        }
 
-            string hourText = AppResources.EventDetailsHour;
-            string minutesText = AppResources.EventDetailsMinutes;
-            string pluralSuffix = "s";
+        private void reorginizeDates(EventsResult res)
+        {
+            CultureInfo culture = new CultureInfo("en-US");
+            double hours = double.Parse(res.duration, culture);
 
-            if (AppResources.ResourceLanguage.StartsWith("tr"))
-                pluralSuffix = "";
-            
-            if (hours == Math.Floor(hours))
-                if (hours > 1)
-                    Duration.Content = TimeSpan.FromHours(hours).ToString("%h' " + hourText + pluralSuffix +"'");
-                else Duration.Content = TimeSpan.FromHours(hours).ToString("%h' " + hourText + pluralSuffix + "'");
-            else Duration.Content = TimeSpan.FromHours(hours).ToString("%h' " + hourText + pluralSuffix + " '%m' " + minutesText + "'");
+            Duration.Content = EmsApi.GetTimeSpan(DateTime.Now.AddHours(-hours), true);
 
             CreatedAt.Content = DateTime.Parse(res.created_at).ToLongDateString();
-                
+
+            Date.Content = DateTime.Parse(res.originalDate).ToLongDateString();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            _eventId = NavigationContext.QueryString["id"];
-            try
+            _eventId = NavigationContext.QueryString["id"].ToString();
+            if (!string.IsNullOrWhiteSpace(_eventId))
             {
-                string isSearch = NavigationContext.QueryString["isSearch"];
-                if (!string.IsNullOrWhiteSpace(isSearch))
-                    _isSearch = bool.Parse(isSearch);
-            }
-            catch (Exception)
-            {
-
+                try
+                {
+                    string isSearch = NavigationContext.QueryString["isSearch"].ToString();
+                    if (!string.IsNullOrWhiteSpace(isSearch))
+                        _isSearch = bool.Parse(isSearch);
+                }
+                catch { }
+                try
+                {
+                    string isCalendar = NavigationContext.QueryString["isCalendar"].ToString();
+                    if (!string.IsNullOrWhiteSpace(isCalendar))
+                        _isCalendar = bool.Parse(isCalendar);
+                    CalendarAddButton.Visibility = System.Windows.Visibility.Collapsed;
+                }
+                catch { }
             }
         }
 
@@ -77,7 +85,7 @@ namespace Ozu_EMS
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText((sender as HyperlinkButton).Content.ToString());
-            EmsApi.showToast("Copied to clipboard!");
+            EmsApi.showToast(AppResources.CopyMessage);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -89,8 +97,8 @@ namespace Ozu_EMS
             //Identify the method that runs after the asynchronous search completes.
             appts.SearchCompleted += appts_SearchCompleted;
 
-            DateTime start = DateTime.Parse(res.event_date);
-            DateTime end = DateTime.Parse(res.event_date).Add(TimeSpan.FromHours(double.Parse(res.duration)));
+            DateTime start = DateTime.Parse(res.originalDate);
+            DateTime end = DateTime.Parse(res.originalDate).Add(TimeSpan.FromHours(double.Parse(res.duration)));
             int max = 20;
 
             //Start the asynchronous search.
@@ -101,33 +109,44 @@ namespace Ozu_EMS
         {
             EventsResult res = e.State as EventsResult;
             double hours = double.Parse(res.duration);
+            DateTime original = DateTime.Parse(res.originalDate);
+            original = original.AddSeconds(-original.Second);
+            string desc = System.Text.RegularExpressions.Regex.Replace(res.description, "(?<!\r)\n", "\r\n");
 
             if (e.Results.Count() != 0)
             {
                 foreach (Appointment appointment in e.Results)
                 {
-                    if(appointment.Details == res.description
+                    if (appointment.StartTime == original
+                        && appointment.EndTime == original.Add(TimeSpan.FromHours(hours))
                         && appointment.Subject == res.name
-                        && appointment.Location == res.address)
+                        && appointment.Location == res.address
+                        && appointment.Details.Length == desc.Length)
                     {
-                        EmsApi.showToast("You already added this event!");
+                        MessageBox.Show(AppResources.AlreadyInTheCalendar, AppResources.InfoTitle, MessageBoxButton.OK);
                         return;
                     }
                 }
+
+                if (MessageBox.Show(AppResources.CalendarPrompt, AppResources.CalenderPromptTitle, MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                    return;
             }
 
             SaveAppointmentTask saveAppointmentTask = new SaveAppointmentTask();
 
-            saveAppointmentTask.StartTime = DateTime.Parse(res.event_date);
-            saveAppointmentTask.EndTime = DateTime.Parse(res.event_date).Add(TimeSpan.FromHours(hours));
+            saveAppointmentTask.StartTime = original;
+            saveAppointmentTask.EndTime = original.Add(TimeSpan.FromHours(hours));
             saveAppointmentTask.Subject = res.name;
             saveAppointmentTask.Location = res.address;
             saveAppointmentTask.Details = res.description;
             saveAppointmentTask.IsAllDayEvent = false;
             saveAppointmentTask.Reminder = Reminder.EighteenHours;
-            saveAppointmentTask.AppointmentStatus = Microsoft.Phone.UserData.AppointmentStatus.Busy;
+            saveAppointmentTask.AppointmentStatus = Microsoft.Phone.UserData.AppointmentStatus.Busy;            
 
             saveAppointmentTask.Show();
+
+            MainPage.data.CalendarData.result.Add(res);
+            EmsApi.SaveToPhone(Newtonsoft.Json.JsonConvert.SerializeObject(MainPage.data.CalendarData), EventsData.calendarDataKey);
         }
 
         private void TextBlock_Loaded(object sender, RoutedEventArgs e)

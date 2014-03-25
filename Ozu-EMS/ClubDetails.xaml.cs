@@ -32,16 +32,22 @@ namespace Ozu_EMS
             _clubId = NavigationContext.QueryString["id"];
         }
 
-        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetText((sender as HyperlinkButton).Content.ToString());
-            EmsApi.showToast("Copied to clipboard!");
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("mailto:[" + (sender as HyperlinkButton).Content.ToString() + "]"));
         }
 
         private void TextBlock_Loaded(object sender, RoutedEventArgs e)
         {
             TextBlock textBlock = sender as TextBlock;
             scrollViewForDesc.IsEnabled = (scrollViewForDesc.ExtentHeight < textBlock.ActualHeight ? true : false);
+        }
+
+        private void TextBlock_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double height = this.title.ActualHeight;
+            Thickness margin = this.title.Margin;
+            this.title.Margin = new Thickness(margin.Left, -height, margin.Right, margin.Bottom);
         }
     }
 }

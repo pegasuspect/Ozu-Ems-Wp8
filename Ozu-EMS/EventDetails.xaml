@@ -34,7 +34,7 @@
                     <Image Source="{Binding cover_image}" Height="200" Stretch="UniformToFill"/>
                     <StackPanel Name="title" Margin="40,-40,0,0" HorizontalAlignment="Right" Background="#A5000000">
                         <TextBlock FontSize="26" Text="{Binding name}" 
-                               TextWrapping="Wrap" VerticalAlignment="Bottom"
+                               TextWrapping="Wrap" VerticalAlignment="Bottom" Foreground="White"
                                Style="{StaticResource PhoneTextTitle3Style}" SizeChanged="TextBlock_SizeChanged"/>
                     </StackPanel>
                 </StackPanel>
@@ -66,11 +66,11 @@
                     <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsCreatedAt, Source={StaticResource LocalizedStrings}}" Grid.Row="2" VerticalAlignment="Center"/>
                     <HyperlinkButton Name="CreatedAt" Grid.Row="2" Content="{Binding created_at}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"    Click="HyperlinkButton_Click"  />
                     <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsDate, Source={StaticResource LocalizedStrings}}" Grid.Row="3" VerticalAlignment="Center"/>
-                    <HyperlinkButton Margin="0,0,0,-4"  Grid.Row="3" FontSize="18" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding event_date}" Click="HyperlinkButton_Click"/>
+                    <HyperlinkButton Name="Date" Margin="0,0,0,-4"  Grid.Row="3" FontSize="18" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding originalDate}" Click="HyperlinkButton_Click"/>
                     <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsDuration, Source={StaticResource LocalizedStrings}}" Grid.Row="4" VerticalAlignment="Center"/>
                     <HyperlinkButton Name="Duration" Grid.Row="4" Content="{Binding duration}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"      Click="HyperlinkButton_Click"  />
                 </Grid>
-                <StackPanel>
+                <StackPanel Name="CalendarAddButton">
                     <Button Content="{Binding Path=LocalizedResources.EventDetailsAddToCalendar, Source={StaticResource LocalizedStrings}}" Click="Button_Click"/>
                 </StackPanel>
             </StackPanel>

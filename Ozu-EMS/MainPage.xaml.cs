@@ -17,139 +17,101 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.IO.IsolatedStorage;
 using Newtonsoft.Json;
+using Microsoft.Phone.UserData;
 
 namespace Ozu_EMS
 {
     public partial class MainPage : PhoneApplicationPage
     {
-        public static ApiJsonData data;
+        public static bool IsOnDebug = true;
+        public static ApiJsonData data = new ApiJsonData();
         public static bool _isEventsLoaded = false;
         public static string version = "1.0";
         public static EmsApi.Languages EmsLanguage = EmsApi.Languages.defaultLanguage;
+
         private static ApplicationBarIconButton searchAppBarButton;
         private static ApplicationBarIconButton settingsAppBarButton;
-        private bool isLoaded = false;        
+        private bool isLoaded = false;
 
         public MainPage()
         {
             InitializeComponent();
-
-            initLanguage();
 
             Loaded += MainPage_Loaded;
 
             EventList.PositionChanged += EventList_PositionChanged;
 
             BuildLocalizedApplicationBar();
-        }
 
+            ThemeManager.ToLightTheme();
+        }
         public async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                _isEventsLoaded = false;
-                EventList.IsEnabled = false;
-
-                LoadingStarted();
-
                 if (!isLoaded)
                 {
+                    initLanguage();
+                    LoadingStarted();
                     await initApplication();
                     isLoaded = true;
                 }
                 else
                 {
-                    //Reset the header and the footer of the events list
-                    EventList.ListHeaderTemplate = null;
-                    EventList.ListFooterTemplate = null;
-
+                    ApplicationBar.IsVisible = false;
+                    LoadingStarted();
                     await updateEventsWithLanguage();
-
+                    await updateClubsWithLanguage();
                     updateButtonTexts();
+                    ApplicationBar.IsVisible = MainPagePivotView.SelectedIndex != 0;
                 }
-
                 LoadingEnd();
-
-                EventList.IsEnabled = true;
-                _isEventsLoaded = true;
-
-                //RaisePropertyChanged(() => data.EventsData.result);
-                // data.EventsData.result
             }
             catch (Exception ex)
             {
-                SetProggressIndicator(false);
-
-                EventList.IsEnabled = true;
-                _isEventsLoaded = true;
-
-                EmsApi.showToast("Main Page: " + ex.Message);
+                EmsApi.Log(ex.Message);
+                LoadingEnd();
             }
-
-
         }
 
-        public static void LoadingEnd()
+        public void LoadingEnd()
         {
-            SetProggressIndicator(false);
+            EmsApi.SetProggressIndicatorVisibility(false);
+            EventList.IsEnabled = true;
+            _isEventsLoaded = true;
+            ClubSelection.isInitialized = true;
+        }
+        public void LoadingStarted()
+        {
+            EmsApi.StartTrayLoadingAnimation();
+            _isEventsLoaded = false;
+            EventList.IsEnabled = false;
+
+            //Reset the header and the footer of the events list
+            EventList.ListHeaderTemplate = null;
+            EventList.ListFooterTemplate = null;
         }
 
-        public static void LoadingStarted()
+        private async Task updateEventsWithLanguage()
         {
-            SystemTray.ProgressIndicator = new ProgressIndicator();
-            SetProggressIndicator(true);
-            SystemTray.ProgressIndicator.Text = AppResources.LoadingMessage;
-        }
-
-        public static async Task updateClubssWithLanguage()
-        {
-            int length = data.ClubsData.result.Count;
-            bool[] isCheckeds = new bool[length];
-
-            for (int i = 0; i < length; i++)
-			     isCheckeds[i] = data.ClubsData.result[i].IsChecked;
-            
-            data.ClubsData.result.Clear();
-
-            ClubsData eventsResultsData = await EmsApi.GetClubsData("", EmsLanguage, true);
-
-            foreach (ClubResult result in eventsResultsData.result)
-                data.ClubsData.result.Add(result);
-
-            for (int i = 0; i < length; i++)
-                data.ClubsData.result[i].IsChecked = isCheckeds[i];
-        }
-
-        public static async Task updateEventsWithLanguage()
-        {
-            data.EventsData.result.Clear();
-
-            EventsData eventsResultsData = await EmsApi.GetEventsInfo("", EmsLanguage);
-
-            foreach (EventsResult result in eventsResultsData.result)
-                data.EventsData.result.Add(result);
-        }
-
-        private async Task initApplication()
-        {
-            data = new ApiJsonData();
-            data.ClubsData = await EmsApi.GetClubsData();
+            EventList.ItemsSource = null;
             data.EventsData = await EmsApi.GetEventsInfo("", EmsLanguage);
-            data.HomeLinks = await EmsApi.GetHomeLinks();
-
-            //Set last button.
-            HomeLinksList.ItemsSource = data.HomeLinks.result.Take<HomeResult>(9).ToList<HomeResult>();
-            HomeResult[] last = { data.HomeLinks.result[data.HomeLinks.result.Length - 1] };
-            LastLink.ItemsSource = last;
-
-            //Load everything to application.
-            DataContext = data;
-
-            if (data.EventsData != null)
-                prettyDisplayDates();
+            EventList.ItemsSource = data.EventsData.result;
+            EmsApi.prettyDisplayDates(data.EventsData.result);
+        }
+        private async Task updateClubsWithLanguage()
+        {
+            ClubsList.ItemsSource = null;
+            ClubsList.IsHitTestVisible = false;
+            EmsApi.StartTrayLoadingAnimation();
+            if (data.ClubsData != null)
+                data.ClubsData = await EmsApi.GetClubsData("", EmsLanguage);
+            EmsApi.SetProggressIndicatorVisibility(false);
+            ClubsList.ItemsSource = data.ClubsData.result;
+            ClubsList.IsHitTestVisible = true;
         }
 
-        private static void initLanguage()
+        private void initLanguage()
         {
             string rawLanguageSettings;
             bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(LanguageSelection.languageKey, out rawLanguageSettings);
@@ -158,20 +120,80 @@ namespace Ozu_EMS
                 EmsLanguage = JsonConvert.DeserializeObject<EmsApi.Languages>(rawLanguageSettings);
                 LanguageSelection.changeLanguageTo(EmsLanguage);
             }
+            else LanguageSelection.changeLanguageTo(EmsApi.Languages.tr);
+        }
+        private async Task initApplication()
+        {
+            data.ClubIdIsCheked = EmsApi.GetClubsIdIsChecked();
+            data.CalendarData = EmsApi.GetCalendarData();
+            resetCalendar();
+            data.ClubsData = await EmsApi.GetClubsData("", EmsLanguage);
+            data.EventsData = await EmsApi.GetEventsInfo("", EmsLanguage);
+            data.HomeLinks = await EmsApi.GetHomeLinks();
+
+            //Set last button.
+            HomeLinksList.ItemsSource = data.HomeLinks.result.Take<HomeResult>(9).ToList<HomeResult>();
+            LastLink.ItemsSource = new List<HomeResult>(){data.HomeLinks.result[data.HomeLinks.result.Length - 1]};
+
+            //Load everything to application.
+            DataContext = data;
+
+            EmsApi.prettyDisplayDates(data.EventsData.result);
         }
 
-        private void prettyDisplayDates()
+        private void resetCalendar()
         {
-            foreach (EventsResult item in EventList.ItemsSource as ObservableCollection<EventsResult>)
+            foreach (EventsResult item in data.CalendarData.result)
+                checkEvent(item);
+        }
+        private void checkEvent(EventsResult res)
+        {
+            Appointments appts = new Appointments();
+
+            //Identify the method that runs after the asynchronous search completes.
+            appts.SearchCompleted += appts_SearchCompleted;
+
+            DateTime start = DateTime.Parse(res.originalDate);
+            DateTime end = DateTime.Parse(res.originalDate).Add(TimeSpan.FromHours(double.Parse(res.duration)));
+            int max = 20;
+
+            //Start the asynchronous search.
+            appts.SearchAsync(start, end, max, res);
+        }
+        void appts_SearchCompleted(object sender, AppointmentsSearchEventArgs e)
+        {
+            EventsResult res = e.State as EventsResult;
+            double hours = double.Parse(res.duration);
+            DateTime original = DateTime.Parse(res.originalDate);
+            original = original.AddSeconds(-original.Second);
+            string desc = System.Text.RegularExpressions.Regex.Replace(res.description, "(?<!\r)\n", "\r\n");
+
+            if (e.Results.Count() != 0)
             {
-                item.event_date = DateTime.Parse(item.event_date).ToLongDateString();
+                foreach (Appointment appointment in e.Results)
+                {
+                    if (appointment.StartTime == original
+                        && appointment.EndTime == original.Add(TimeSpan.FromHours(hours))
+                        && appointment.Subject == res.name
+                        && appointment.Location == res.address
+                        && appointment.Details.Length == desc.Length)
+                    {
+                        res.isInCalendar = true;
+                    }
+                }
             }
+            if (!res.isInCalendar)
+            {
+                data.CalendarData.result.Remove(res);
+                EmsApi.SaveToPhone(JsonConvert.SerializeObject(data.CalendarData), EventsData.calendarDataKey);
+            }
+
         }
 
         private async void EventList_PositionChanged(object sender, EventArgs e)
         {
             ViewportControl viewport = sender as ViewportControl;
-            if (MainPage._isEventsLoaded && viewport.ManipulationState != System.Windows.Controls.Primitives.ManipulationState.Idle)
+            if (MainPage._isEventsLoaded && viewport.ManipulationState == System.Windows.Controls.Primitives.ManipulationState.Animating)
             {
                 ObservableCollection<EventsResult> res = MainPage.data.EventsData.result;
 
@@ -180,14 +202,14 @@ namespace Ozu_EMS
                     //Loading...
                     EventList.ListFooterTemplate = (DataTemplate)Application.Current.Resources["EventsFooterTemplate"];
 
-                    string baseUrl = EmsApi.getBaseUrl("events", "v1", "after", EmsApi.GetClubIds(), "", (res[res.Count - 1] as EventsResult).id);
+                    string baseUrl = EmsApi.getBaseUrl("events", "v1", "after", EmsApi.GetClubIds(), "", (res[res.Count - 1] as EventsResult).id, 0, "", "", EmsLanguage);
                     EventsData freshEventsList = await EmsApi.getRawResponseAs<EventsData>(baseUrl);
+
+                    EmsApi.prettyDisplayDates(freshEventsList.result);
 
                     //Appending...
                     foreach (EventsResult item in freshEventsList.result)
                         MainPage.data.EventsData.result.Add(item);
-
-                    prettyDisplayDates();
 
                     //Displaying the footer acording to data obtained.
                     if (freshEventsList == null || freshEventsList.result.Count < 10)
@@ -200,27 +222,21 @@ namespace Ozu_EMS
                     //Loading...
                     EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["EventsHeaderTemplate"];
 
-                    string baseUrl = EmsApi.getBaseUrl("events", "v1", "before", EmsApi.GetClubIds(), "", (res[0] as EventsResult).id);
+                    string baseUrl = EmsApi.getBaseUrl("events", "v1", "before", EmsApi.GetClubIds(), "", (res[0] as EventsResult).id, 0, "", "", EmsLanguage);
                     EventsData oldEvents = await EmsApi.getRawResponseAs<EventsData>(baseUrl);
+
+                    EmsApi.prettyDisplayDates(oldEvents.result);
 
                     //Appending to the top of the list...
                     foreach (EventsResult oldResult in oldEvents.result)
                         MainPage.data.EventsData.result.Insert(0, oldResult);
 
-                    prettyDisplayDates();
-
                     //Displaying the header acording to data obtained.
                     if (oldEvents == null || oldEvents.result.Count < 10)
                         EventList.ListHeaderTemplate = (DataTemplate)Application.Current.Resources["ReachedFirstEventHeaderTemplate"];
                     else EventList.ListHeaderTemplate = null;
-                }                
+                }
             }
-        }
-
-        private static void SetProggressIndicator(bool isVisible)
-        {
-            SystemTray.ProgressIndicator.IsIndeterminate = isVisible;
-            SystemTray.ProgressIndicator.IsVisible = isVisible;
         }
 
         private void BuildLocalizedApplicationBar()
@@ -249,8 +265,6 @@ namespace Ozu_EMS
             //    new ApplicationBarMenuItem(AppResources.SettingsButtonText);
             //ApplicationBar.MenuItems.Add(appBarMenuItem);
         }
-
-
         public static void updateButtonTexts()
         {
             settingsAppBarButton.Text = AppResources.SettingsButtonText;
@@ -261,7 +275,6 @@ namespace Ozu_EMS
         {
             NavigationService.Navigate(new Uri("/Search.xaml", UriKind.RelativeOrAbsolute));
         }
-
         private void settingsAppBarButton_Click(object sender, EventArgs e)
         {
             NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.RelativeOrAbsolute));
@@ -276,30 +289,20 @@ namespace Ozu_EMS
 
             HomeResult tile = lls.SelectedItem as HomeResult;
 
-            WebBrowserTask webBrowserTask = new WebBrowserTask();
-            webBrowserTask.Uri = new Uri(tile.link);
-            webBrowserTask.Show();
+            NavigationService.Navigate(new Uri("/LinkerBrowser.xaml?url=" + tile.link, UriKind.RelativeOrAbsolute));
+
+            //WebBrowserTask webBrowserTask = new WebBrowserTask();
+            //webBrowserTask.Uri = new Uri(tile.link);
+            //webBrowserTask.Show();
 
             lls.SelectedItem = null;
         }
-
         private void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Pivot item = sender as Pivot;
 
-            if (item.SelectedIndex == 1)
-            {
-                try {
-                    if (MainPage.data.EventsData.result.Count == 0)
-                        MainPage.data.EventsData.result.Add(new EventsResult() { name = "No Events!", event_date = "Check your settings for club filters!" });
-                } catch { }
-
-                ApplicationBar.IsVisible = true;
-                return;
-            }
-            ApplicationBar.IsVisible = false;
+            ApplicationBar.IsVisible = item.SelectedIndex != 0;
         }
-
         private void LongListSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LongListSelector lls = sender as LongListSelector;
@@ -313,6 +316,31 @@ namespace Ozu_EMS
 
             lls.SelectedItem = null;
         }
+        private void ClubList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            LongListSelector lls = sender as LongListSelector;
 
+            if (lls == null || lls.SelectedItem == null)
+                return;
+
+            ClubResult item = lls.SelectedItem as ClubResult;
+
+            NavigationService.Navigate(new Uri("/ClubDetails.xaml?id=" + item.id, UriKind.RelativeOrAbsolute));
+
+            lls.SelectedItem = null;
+        }
+        private void CalendarsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            LongListSelector lls = sender as LongListSelector;
+
+            if (lls == null || lls.SelectedItem == null)
+                return;
+
+            EventsResult item = lls.SelectedItem as EventsResult;
+
+            NavigationService.Navigate(new Uri("/EventDetails.xaml?id=" + item.id + "&isCalendar=true", UriKind.RelativeOrAbsolute));
+
+            lls.SelectedItem = null;
+        }
     }
 }
