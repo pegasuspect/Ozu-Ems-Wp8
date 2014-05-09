@@ -44,7 +44,7 @@ namespace Ozu_EMS
             bool inPhoneMemmory = IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(withKey, out rawApiResponse);
             bool homeIsUpToDate = await IsHomeVersionUpToDate();
 
-            if (inPhoneMemmory && homeIsUpToDate)
+            if (homeIsUpToDate && inPhoneMemmory)
             {
                 return JsonConvert.DeserializeObject<HomeLinks>(rawApiResponse);
             }
@@ -293,11 +293,10 @@ namespace Ozu_EMS
         {
             foreach (EventsResult item in items)
             {
-                DateTime date;
-                DateTime.TryParse(item.event_date, out date);
-                item.originalDate = item.event_date;
+                DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Local).AddSeconds(double.Parse(item.event_date));
                 if (date != null && 2011 <= date.Year)
-                    item.event_date = GetTimeSpan(date);
+                    item.prettyDate = GetTimeSpan(date);
+                else item.prettyDate = GetTimeSpan(DateTime.Now, true);
 
             }
         }

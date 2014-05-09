@@ -131,11 +131,6 @@ namespace Ozu_EMS
             data.EventsData = await EmsApi.GetEventsInfo("", EmsLanguage);
             data.HomeLinks = await EmsApi.GetHomeLinks();
 
-            //Set last button.
-            HomeLinksList.ItemsSource = data.HomeLinks.result.Take<HomeResult>(9).ToList<HomeResult>();
-            LastLink.ItemsSource = new List<HomeResult>(){data.HomeLinks.result[data.HomeLinks.result.Length - 1]};
-
-            //Load everything to application.
             DataContext = data;
 
             EmsApi.prettyDisplayDates(data.EventsData.result);
@@ -153,8 +148,8 @@ namespace Ozu_EMS
             //Identify the method that runs after the asynchronous search completes.
             appts.SearchCompleted += appts_SearchCompleted;
 
-            DateTime start = DateTime.Parse(res.originalDate);
-            DateTime end = DateTime.Parse(res.originalDate).Add(TimeSpan.FromHours(double.Parse(res.duration)));
+            DateTime start = DateTime.Parse(res.event_date);
+            DateTime end = DateTime.Parse(res.event_date).Add(TimeSpan.FromHours(double.Parse(res.duration)));
             int max = 20;
 
             //Start the asynchronous search.
@@ -164,7 +159,7 @@ namespace Ozu_EMS
         {
             EventsResult res = e.State as EventsResult;
             double hours = double.Parse(res.duration);
-            DateTime original = DateTime.Parse(res.originalDate);
+            DateTime original = DateTime.Parse(res.event_date);
             original = original.AddSeconds(-original.Second);
             string desc = System.Text.RegularExpressions.Regex.Replace(res.description, "(?<!\r)\n", "\r\n");
 
@@ -291,10 +286,6 @@ namespace Ozu_EMS
 
             NavigationService.Navigate(new Uri("/LinkerBrowser.xaml?url=" + tile.link, UriKind.RelativeOrAbsolute));
 
-            //WebBrowserTask webBrowserTask = new WebBrowserTask();
-            //webBrowserTask.Uri = new Uri(tile.link);
-            //webBrowserTask.Show();
-
             lls.SelectedItem = null;
         }
         private void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -341,6 +332,11 @@ namespace Ozu_EMS
             NavigationService.Navigate(new Uri("/EventDetails.xaml?id=" + item.id + "&isCalendar=true", UriKind.RelativeOrAbsolute));
 
             lls.SelectedItem = null;
+        }
+
+        private void Grid_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/LinkerBrowser.xaml?url=" + data.HomeLinks.result[9].link, UriKind.RelativeOrAbsolute));
         }
     }
 }

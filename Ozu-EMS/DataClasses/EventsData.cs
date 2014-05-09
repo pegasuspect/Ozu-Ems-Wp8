@@ -29,7 +29,7 @@ namespace Ozu_EMS
     public class EventsResult
     {
         public bool isInCalendar { get; set; }
-        public string originalDate { get; set; }
+        public string prettyDate { get; set; }
         public string id { get; set; }
         public string event_id { get; set; }
         public string club_id { get; set; }

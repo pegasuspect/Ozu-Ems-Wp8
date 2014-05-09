@@ -66,7 +66,7 @@
                     <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsCreatedAt, Source={StaticResource LocalizedStrings}}" Grid.Row="2" VerticalAlignment="Center"/>
                     <HyperlinkButton Name="CreatedAt" Grid.Row="2" Content="{Binding created_at}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"    Click="HyperlinkButton_Click"  />
                     <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsDate, Source={StaticResource LocalizedStrings}}" Grid.Row="3" VerticalAlignment="Center"/>
-                    <HyperlinkButton Name="Date" Margin="0,0,0,-4"  Grid.Row="3" FontSize="18" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding originalDate}" Click="HyperlinkButton_Click"/>
+                    <HyperlinkButton Name="Date" Margin="0,0,0,-4"  Grid.Row="3" FontSize="18" Grid.Column="1" HorizontalAlignment="Left" Content="{Binding prettyDate}" Click="HyperlinkButton_Click"/>
                     <TextBlock Text="{Binding Path=LocalizedResources.EventDetailsDuration, Source={StaticResource LocalizedStrings}}" Grid.Row="4" VerticalAlignment="Center"/>
                     <HyperlinkButton Name="Duration" Grid.Row="4" Content="{Binding duration}" Margin="0,0,0,-4" FontSize="18" Grid.Column="1" HorizontalAlignment="Left"      Click="HyperlinkButton_Click"  />
                 </Grid>

@@ -14,7 +14,7 @@
         <SolidColorBrush x:Key="GrayButtonBrush" Color="#DDD"/>
         <DataTemplate x:Key="ButtonTileTemplate">
             <Grid Background="#28F"
-                      Height="150"
+                      Height="166"
                       Margin="10">
                 <TextBlock 
                         Text="{Binding title}"

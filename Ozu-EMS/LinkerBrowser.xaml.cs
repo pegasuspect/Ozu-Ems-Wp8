@@ -23,6 +23,7 @@ namespace Ozu_EMS
         {
             string url;
             NavigationContext.QueryString.TryGetValue("url", out url);
+            Browser.IsScriptEnabled = true;
             Browser.Navigate(new Uri(url, UriKind.Absolute));
         }
 

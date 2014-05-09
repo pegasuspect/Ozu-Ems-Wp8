@@ -47,7 +47,7 @@ namespace Ozu_EMS
 
             CreatedAt.Content = DateTime.Parse(res.created_at).ToLongDateString();
 
-            Date.Content = DateTime.Parse(res.originalDate).ToLongDateString();
+            Date.Content = DateTime.Parse(res.event_date).ToLongDateString();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -97,8 +97,8 @@ namespace Ozu_EMS
             //Identify the method that runs after the asynchronous search completes.
             appts.SearchCompleted += appts_SearchCompleted;
 
-            DateTime start = DateTime.Parse(res.originalDate);
-            DateTime end = DateTime.Parse(res.originalDate).Add(TimeSpan.FromHours(double.Parse(res.duration)));
+            DateTime start = DateTime.Parse(res.event_date);
+            DateTime end = DateTime.Parse(res.event_date).Add(TimeSpan.FromHours(double.Parse(res.duration)));
             int max = 20;
 
             //Start the asynchronous search.
@@ -109,7 +109,7 @@ namespace Ozu_EMS
         {
             EventsResult res = e.State as EventsResult;
             double hours = double.Parse(res.duration);
-            DateTime original = DateTime.Parse(res.originalDate);
+            DateTime original = DateTime.Parse(res.event_date);
             original = original.AddSeconds(-original.Second);
             string desc = System.Text.RegularExpressions.Regex.Replace(res.description, "(?<!\r)\n", "\r\n");
 

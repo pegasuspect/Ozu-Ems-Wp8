@@ -15,7 +15,32 @@
     Foreground="White"
     SupportedOrientations="PortraitOrLandscape"  Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
-
+    <phone:PhoneApplicationPage.Resources>
+        <DataTemplate x:Key="ListTemplate">
+            <StackPanel Margin="0,5">
+                <Image Width="32" Height="32" HorizontalAlignment="Left" Margin="20,0,0,5"
+                    Source="{Binding club_logo, Mode=OneWay}" Stretch="UniformToFill" >
+                    <Image.Clip>
+                        <EllipseGeometry Center="16, 16" RadiusX="16" RadiusY="16"/>
+                    </Image.Clip>
+                </Image>
+                <TextBlock Height="24" Width="320" HorizontalAlignment="Left" Foreground="Gray" Margin="60, -45, 0,0"
+                           Text="{Binding club_name, Mode=OneWay}" TextWrapping="NoWrap"
+                           />
+                <TextBlock Height="24" Width="50" HorizontalAlignment="Right" Foreground="Gray" Margin="60, -45, 0,0"
+                           Text="{Binding prettyDate, Mode=OneWay}" TextWrapping="NoWrap" TextAlignment="Right"
+                           />
+                <StackPanel>
+                    <Image Height="200" Source="{Binding cover_image, Mode=OneWay}" Stretch="UniformToFill" />
+                
+                    <StackPanel Margin="0,-50,0,0" Background="#A5000000">
+                        <TextBlock Text="{Binding name, Mode=OneWay}" TextWrapping="NoWrap" Foreground="White"
+                                   Margin="12,12,0,12" Style="{StaticResource PhoneTextNormalStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </phone:PhoneApplicationPage.Resources>
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <phone:Pivot Name="MainPagePivotView" Title="{Binding Path=LocalizedResources.ApplicationTitle, Source={StaticResource LocalizedStrings}}" SelectionChanged="Pivot_SelectionChanged">
@@ -24,26 +49,37 @@
                 <StackPanel>
                     <phone:LongListSelector ScrollViewer.VerticalScrollBarVisibility="Disabled"
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        Margin="0,-20,-12,0" ItemsSource="{Binding HomeLinks.result}" 
+                        Margin="0,-12,-12,0" ItemsSource="{Binding HomeLinks.result}" 
                         Name="HomeLinksList" LayoutMode="Grid" 
-                        GridCellSize="150, 150" ItemTemplate="{StaticResource ButtonTileTemplate}"
+                        GridCellSize="150, 166" ItemTemplate="{StaticResource ButtonTileTemplate}"
                         SelectionChanged="HomeLinksList_SelectionChanged"
-                        Height="450" VerticalAlignment="Top"/>
+                        Height="500" VerticalAlignment="Top"/>
 
-                    <phone:LongListSelector 
-                        x:Name="LastLink" ItemsSource="{Binding HomeLinks.result}"
-                        Height="150" Width="463" VerticalAlignment="Top"
-                        ItemTemplate="{StaticResource ButtonTileTemplate}"
-                        SelectionChanged="HomeLinksList_SelectionChanged" />
+                    <StackPanel x:Name="LastLink" Height="150" 
+                                Width="445" VerticalAlignment="Top"
+                                >
+                        <Grid Background="#28F" Height="150" 
+                              Margin="3,10,10,10" Tap="Grid_Tap">
+                            <TextBlock 
+                                Text="{Binding HomeLinks.result[9].title}"
+                                TextAlignment="Center" 
+                                VerticalAlignment="Center"
+                                TextWrapping="Wrap"
+                                FontSize="18"
+                                Foreground="White"
+                                />
+                        </Grid>
+                    </StackPanel>
+                    
                 </StackPanel>
             </phone:PivotItem>
-
+            
             <!--Pivot item two-->
-            <phone:PivotItem Header="{Binding Path=LocalizedResources.EventsTitle, Source={StaticResource LocalizedStrings}}">
+            <phone:PivotItem Margin="0"
+                Header="{Binding Path=LocalizedResources.EventsTitle, Source={StaticResource LocalizedStrings}}">
                 <Grid>
                     <u:CustomLongListSelector
                         Name="EventList"
-                        Margin="10,0" 
                         ItemsSource="{Binding EventsData.result, Mode=TwoWay}"
                         ItemTemplate="{StaticResource ListTemplate}"
                         SelectionChanged="LongListSelector_SelectionChanged"
